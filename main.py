@@ -10,7 +10,7 @@ import feedparser
 import re
 import asyncio
 from keep_alive import keep_alive
-
+import os
 interval = 10  # change this to the number of seconds between each check
 emote_to_put_at_message_start = "<:Yossixhehe:1109926657613103154>"
 pattern = (r"twitter\.com", "fxtwitter.com"
@@ -169,7 +169,7 @@ def load_last_message():
 keep_alive()
 last_message = load_last_message()
 client.run(
-    os.getenv("TOKEN")
+    os.environ.get("TOKEN")
 )  #get your bot token and make a file called ".env" then inside the file write TOKEN=put your api key here example in env.txt
 #to keep your bot from shutting down use https://uptimerobot.com then create a https:// monitor and put the link to the website that appewars when you run this repl in the monitor and it will keep your bot alive by pinging the flask server
 #enjoy!
