@@ -164,8 +164,8 @@ def save_last_message(message):
 
 
 def load_last_message():
-   return bot_data_ref.get().val()["last_message"]
-
+  data = json.loads(bot_data_ref.get()) # parse the JSON string into a dictionary
+  return data["last_message"] 
 
 
 # run the bot with your token
