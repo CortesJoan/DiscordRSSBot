@@ -38,7 +38,7 @@ cred_object = credentials.Certificate('./serviceAccountKey.json')
 firebase_admin.initialize_app(cred_object, {
     'databaseURL': 'https://botfiguras-default-rtdb.europe-west1.firebasedatabase.app/'}) # Replace this with your database URL
 ref = db.reference('/')
-bot_data_ref = ref.child("bot_data")
+bot_data_ref = ref.child("last_message")
 @client.event
 async def on_ready():
   print("bot online"
@@ -165,8 +165,7 @@ def save_last_message(message):
 
 
 def load_last_message():
-  data = json.loads(bot_data_ref.get()) # parse the JSON string into a dictionary
-  return data["last_message"] 
+ return bot_data_ref.get()
 
 
 # run the bot with your token
