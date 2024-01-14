@@ -30,7 +30,7 @@ client = commands.Bot(command_prefix='loli',
                       intents=intents)  #put your own prefix here
 cred = credentials.Certificate('./serviceAccountKey.json')
 firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://botfiguras-default-rtdb.europe-west1.firebasedatabase.app/' # Replace this with your database URL
+    'databaseURL': 'https://botfiguras-default-rtdb.europe-west1.firebasedatabase.app/'}) # Replace this with your database URL
 ref = db.reference('/')
 bot_data_ref = ref.child("bot_data")
 @client.event
