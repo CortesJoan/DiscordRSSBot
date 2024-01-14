@@ -14,6 +14,7 @@ import os
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
+import json
 
 interval = 10  # change this to the number of seconds between each check
 emote_to_put_at_message_start = "<:Yossixhehe:1109926657613103154>"
