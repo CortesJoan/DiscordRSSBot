@@ -163,10 +163,11 @@ def load_last_message():
       else:
         # Return file content
         return file.read()
+  except FileNotFoundError:
+    return last_message
 
 
 # run the bot with your token
-
 keep_alive()
 last_message = load_last_message()
 client.run(
