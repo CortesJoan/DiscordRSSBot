@@ -12,6 +12,7 @@ import asyncio
 from keep_alive import keep_alive
 import os
 from firebase_admin import credentials
+from firebase_admin import firebase_admin
 
 interval = 10  # change this to the number of seconds between each check
 emote_to_put_at_message_start = "<:Yossixhehe:1109926657613103154>"
