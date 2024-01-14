@@ -23,7 +23,7 @@ pattern = (r"twitter\.com", "fxtwitter.com"
 last_post = None  # store the last post title
 last_message = None
 rss_url = "https://nitter.uni-sonia.com/Hobbyfiguras/rss"  # change this to your RSS feed URL
-channel_ids = [1059813170589479016, 1072888000507285524,1189005278797115472
+channel_ids = [1059813170589479016, 1072888000507285524
                ]  # change this to your channel ID
 
 #^ basic imports for other features of discord.py and python ^
