@@ -165,7 +165,7 @@ def save_last_message(message):
 
 
 def load_last_message():
- return bot_data_ref.get()
+ return bot_data_ref.get()["last_message"]
 
 
 # run the bot with your token
