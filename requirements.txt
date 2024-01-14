@@ -1,3 +1,4 @@
 flask
 discord
 feedparser
+firebase_admin

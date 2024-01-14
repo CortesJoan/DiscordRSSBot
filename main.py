@@ -11,6 +11,8 @@ import re
 import asyncio
 from keep_alive import keep_alive
 import os
+from firebase_admin import credentials
+
 interval = 10  # change this to the number of seconds between each check
 emote_to_put_at_message_start = "<:Yossixhehe:1109926657613103154>"
 pattern = (r"twitter\.com", "fxtwitter.com"
@@ -18,16 +20,19 @@ pattern = (r"twitter\.com", "fxtwitter.com"
 last_post = None  # store the last post title
 last_message = None
 rss_url = "https://nitter.uni-sonia.com/Hobbyfiguras/rss"  # change this to your RSS feed URL
-channel_ids = [1059813170589479016, 1072888000507285524,
-               1189005278797115472]  # change this to your channel ID
+channel_ids = [1059813170589479016, 1072888000507285524
+               ]  # change this to your channel ID
 
 #^ basic imports for other features of discord.py and python ^
 intents = discord.Intents.all()
 
 client = commands.Bot(command_prefix='loli',
                       intents=intents)  #put your own prefix here
-
-
+cred = credentials.Certificate('./serviceAccountKey.json')
+firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://botfiguras-default-rtdb.europe-west1.firebasedatabase.app/' # Replace this with your database URL
+ref = db.reference('/')
+bot_data_ref = ref.child("bot_data")
 @client.event
 async def on_ready():
   print("bot online"
@@ -149,22 +154,13 @@ def prepare_specific_rss(number: int):
  
 # Add this code at the end of your main.py file
 def save_last_message(message):
-  with open("last_message.txt", "w") as file:
-    file.write(message)
+    bot_data_ref.update({"last_message": message})
+
 
 
 def load_last_message():
-  try:
-    with open("last_message.txt", "r") as file:
-    # Check if file is empty
-      if os.path.getsize("last_message.txt") == 0:
-        # Return global variable
-        return last_message
-      else:
-        # Return file content
-        return file.read()
-  except FileNotFoundError:
-    return last_message
+   return bot_data_ref.get().val()["last_message"]
+
 
 
 # run the bot with your token
