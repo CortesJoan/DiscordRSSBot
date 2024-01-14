@@ -98,6 +98,8 @@ async def send_rss():
       new_message = prepare_specific_rss(0)
       if new_message and new_message != last_message and new_message is not last_message:  # check if there is a new message and it's different from the last one
         print("Messages are not the same")
+        if not last_message:
+          print("there is no last message so this one must be the first one")
         await channel.send(new_message)  # send the message to the channel
         print("Message sended")
       else:
@@ -144,12 +146,7 @@ def prepare_specific_rss(number: int):
   return message
 
 
-@client.tree.command()
-async def hello(interaction: discord.Interaction):
-  """Says hello!"""
-  await interaction.response.send_message(f'Hi, {interaction.user.mention}')
-
-
+ 
 # Add this code at the end of your main.py file
 def save_last_message(message):
   with open("last_message.txt", "w") as file:
@@ -159,9 +156,13 @@ def save_last_message(message):
 def load_last_message():
   try:
     with open("last_message.txt", "r") as file:
-      return file.read()
-  except FileNotFoundError:
-    return None
+    # Check if file is empty
+      if os.path.getsize("last_message.txt") == 0:
+        # Return global variable
+        return last_message
+      else:
+        # Return file content
+        return file.read()
 
 
 # run the bot with your token
@@ -170,6 +171,4 @@ keep_alive()
 last_message = load_last_message()
 client.run(
     os.environ.get("TOKEN")
-)  #get your bot token and make a file called ".env" then inside the file write TOKEN=put your api key here example in env.txt
-#to keep your bot from shutting down use https://uptimerobot.com then create a https:// monitor and put the link to the website that appewars when you run this repl in the monitor and it will keep your bot alive by pinging the flask server
-#enjoy!
+)
