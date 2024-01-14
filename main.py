@@ -30,7 +30,7 @@ intents = discord.Intents.all()
 client = commands.Bot(command_prefix='loli',
                       intents=intents)
                       #put your own prefix here
-cred_obj = credentials.Certificate('./serviceAccountKey.json')
+cred_object = credentials.Certificate('./serviceAccountKey.json')
 
 
 firebase_admin.initialize_app(cred_object, {
