@@ -11,8 +11,8 @@ import re
 import asyncio
 from keep_alive import keep_alive
 import os
+import firebase_admin
 from firebase_admin import credentials
-from firebase_admin import firebase_admin
 
 interval = 10  # change this to the number of seconds between each check
 emote_to_put_at_message_start = "<:Yossixhehe:1109926657613103154>"
@@ -28,8 +28,12 @@ channel_ids = [1059813170589479016, 1072888000507285524
 intents = discord.Intents.all()
 
 client = commands.Bot(command_prefix='loli',
-                      intents=intents)  #put your own prefix here
-firebase_admin.initialize_app(cred, {
+                      intents=intents)
+                      #put your own prefix here
+cred_obj = credentials.Certificate('./serviceAccountKey.json')
+
+
+firebase_admin.initialize_app(cred_object, {
     'databaseURL': 'https://botfiguras-default-rtdb.europe-west1.firebasedatabase.app/'}) # Replace this with your database URL
 ref = db.reference('/')
 bot_data_ref = ref.child("bot_data")
