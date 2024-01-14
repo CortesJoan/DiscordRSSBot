@@ -28,7 +28,6 @@ intents = discord.Intents.all()
 
 client = commands.Bot(command_prefix='loli',
                       intents=intents)  #put your own prefix here
-cred = credentials.Certificate('./serviceAccountKey.json')
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://botfiguras-default-rtdb.europe-west1.firebasedatabase.app/'}) # Replace this with your database URL
 ref = db.reference('/')
