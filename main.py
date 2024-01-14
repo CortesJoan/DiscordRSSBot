@@ -171,6 +171,7 @@ def load_last_message():
 # run the bot with your token
 keep_alive()
 last_message = load_last_message()
+print("the saved message"+last_message)
 client.run(
     os.environ.get("TOKEN")
 )
