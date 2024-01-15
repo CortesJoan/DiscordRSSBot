@@ -20,25 +20,26 @@ interval = 10  # change this to the number of seconds between each check
 emote_to_put_at_message_start = "<:Yossixhehe:1109926657613103154>"
 pattern = (r"twitter\.com", "fxtwitter.com"
            )  # change this to the (old, new) strings to replace
-last_post = None  # store the last post title
+last_link = ""
 last_message = None
 rss_url = "https://nitter.uni-sonia.com/Hobbyfiguras/rss"  # change this to your RSS feed URL
 channel_ids = [1059813170589479016, 1072888000507285524,1189005278797115472
                ]  # change this to your channel ID
 
-#^ basic imports for other features of discord.py and python ^
-intents = discord.Intents.all()
 
+
+
+
+intents = discord.Intents.all()
 client = commands.Bot(command_prefix='loli',
                       intents=intents)
                       #put your own prefix here
 cred_object = credentials.Certificate('./serviceAccountKey.json')
-
-
 firebase_admin.initialize_app(cred_object, {
     'databaseURL': 'https://botfiguras-default-rtdb.europe-west1.firebasedatabase.app/'}) # Replace this with your database URL
 ref = db.reference('/')
 bot_data_ref = ref.child("last_message")
+
 @client.event
 async def on_ready():
   print("bot online"
@@ -101,16 +102,15 @@ async def add(interaction: discord.Interaction, first_value: int,
 async def send_rss():
   print("Time to check")
   global last_message
+  global last_link
   new_message = last_message
   for channel_id in channel_ids:  # iterate over the channel IDs
     channel = client.get_channel(
         channel_id)  # get the discord channel for each ID
     if channel is not None:  # check if the channel is valid
       new_message = prepare_specific_rss(0)
-      if new_message and new_message != last_message and new_message is not last_message:  # check if there is a new message and it's different from the last one
+      if last_link != bot_data_ref.get()["last_link"]:
         print("Messages are not the same")
-        if not last_message:
-          print("there is no last message so this one must be the first one")
         await channel.send(new_message)  # send the message to the channel
         print("Message sended")
       else:
@@ -120,6 +120,7 @@ async def send_rss():
       print(f"Could not find channel with ID {channel_id}")
   last_message = new_message
   save_last_message(last_message)
+  
 
   print(last_message)
   await asyncio.sleep(interval)
@@ -139,15 +140,16 @@ async def force_rss_get(ctx, number: int):
 
 
 def prepare_specific_rss(number: int):
+  global last_link
   message = ""
   feed = feedparser.parse(rss_url)  # parse the RSS feed
   if feed.entries:  # check if there are any entries
     if 0 <= number < len(feed.entries):  # validate the number
       latest = feed.entries[number]  # get the latest entry
-      last_post = latest.title  # update the last post
       link = latest.link  # get the link
       link = re.sub(pattern[0], pattern[1],
                     link)  # replace the old string with the new string
+      last_link=link    
       message = f"🧸| **{latest.title}**\n{link}"
       message = re.sub(r'<[^>]*>', '', message)
       message = re.sub("🧸", emote_to_put_at_message_start, message)
@@ -160,7 +162,9 @@ def prepare_specific_rss(number: int):
  
 # Add this code at the end of your main.py file
 def save_last_message(message):
+    global last_link
     bot_data_ref.update({"last_message": message})
+    bot_data_ref.update({"last_link": last_link})
 
 
 
@@ -171,7 +175,8 @@ def load_last_message():
 # run the bot with your token
 keep_alive()
 last_message = load_last_message()
-print("the saved message"+last_message)
+last_link= bot_data_ref.get()["last_link"]
+print("the saved message"+last_message + "with link: " + last_link)
 client.run(
     os.environ.get("TOKEN")
 )
