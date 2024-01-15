@@ -142,26 +142,26 @@ async def force_rss_get(ctx, number: int):
 def prepare_specific_rss(number: int):
   global last_link
   global last_message
-  message = ""
+  message = last_message
   try:
     feed = feedparser.parse(rss_url)  # parse the RSS feed
     if feed.entries:  # check if there are any entries
-    if 0 <= number < len(feed.entries):  # validate the number
-      latest = feed.entries[number]  # get the latest entry
-      link = latest.link  # get the link
-      link = re.sub(pattern[0], pattern[1],
-                    link)  # replace the old string with the new string
-      last_link=link    
-      message = f"🧸| **{latest.title}**\n{link}"
-      message = re.sub(r'<[^>]*>', '', message)
-      message = re.sub("🧸", emote_to_put_at_message_start, message)
-      message = re.sub("@Hobbyfiguras: ", '', message)
-      message = re.sub("https://nitter.uni-sonia.com", 'https://fxtwitter.com',
-                       message)
+        if 0 <= number < len(feed.entries):  # validate the number
+          latest = feed.entries[number]  # get the latest entry
+          link = latest.link  # get the link
+          link = re.sub(pattern[0], pattern[1],
+                        link)  # replace the old string with the new string
+          last_link=link    
+          message = f"🧸| **{latest.title}**\n{link}"
+          message = re.sub(r'<[^>]*>', '', message)
+          message = re.sub("🧸", emote_to_put_at_message_start, message)
+          message = re.sub("@Hobbyfiguras: ", '', message)
+          message = re.sub("https://nitter.uni-sonia.com", 'https://fxtwitter.com',
+                           message)
     return message
   except URLError as e:
     print("Error while parsing RSS feed: ", e)
-    return last_message
+    return message
 
  
 # Add this code at the end of your main.py file
