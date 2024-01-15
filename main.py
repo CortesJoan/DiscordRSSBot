@@ -141,9 +141,11 @@ async def force_rss_get(ctx, number: int):
 
 def prepare_specific_rss(number: int):
   global last_link
+  global last_message
   message = ""
-  feed = feedparser.parse(rss_url)  # parse the RSS feed
-  if feed.entries:  # check if there are any entries
+  try:
+    feed = feedparser.parse(rss_url)  # parse the RSS feed
+    if feed.entries:  # check if there are any entries
     if 0 <= number < len(feed.entries):  # validate the number
       latest = feed.entries[number]  # get the latest entry
       link = latest.link  # get the link
@@ -156,8 +158,10 @@ def prepare_specific_rss(number: int):
       message = re.sub("@Hobbyfiguras: ", '', message)
       message = re.sub("https://nitter.uni-sonia.com", 'https://fxtwitter.com',
                        message)
-  return message
-
+    return message
+  except URLError as e:
+    print("Error while parsing RSS feed: ", e)
+    return last_message
 
  
 # Add this code at the end of your main.py file
