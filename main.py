@@ -15,7 +15,7 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 import json
-
+from flask import redirect
 interval = 10  # change this to the number of seconds between each check
 emote_to_put_at_message_start = "<:Yossixhehe:1109926657613103154>"
 pattern = (r"twitter\.com", "fxtwitter.com"
@@ -185,3 +185,4 @@ print("the saved message"+last_message + "with link: " + last_link)
 client.run(
     os.environ.get("TOKEN")
 )
+redirect(db.reference('linkRuleta').get(), code=302)
