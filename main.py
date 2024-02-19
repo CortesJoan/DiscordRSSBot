@@ -22,7 +22,7 @@ pattern = (r"twitter\.com", "fxtwitter.com"
            )  # change this to the (old, new) strings to replace
 last_link = ""
 last_message = None
-rss_url = "https://nitter.x86-64-unknown-linux-gnu.zip/Hobbyfiguras/rss"
+rss_url = "https://nitter.privacydev.net/hobbyfiguras/rss"
 #"https://nitter.uni-sonia.com/Hobbyfiguras/rss"  # change this to your RSS feed URL
 channel_ids = [1059813170589479016, 1072888000507285524,1189005278797115472
                ]  # change this to your channel ID
@@ -185,4 +185,3 @@ print("the saved message"+last_message + "with link: " + last_link)
 client.run(
     os.environ.get("TOKEN")
 )
-redirect(db.reference('linkRuleta').get(), code=302)
