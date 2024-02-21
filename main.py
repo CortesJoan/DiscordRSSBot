@@ -152,10 +152,9 @@ def prepare_specific_rss(number: int):
         if 0 <= number < len(feed.entries):  # validate the number
           latest = feed.entries[number]  # get the latest entry
           link = latest.link  # get the link
-          link = re.sub(rss_base_domain, 'https://fxtwitter.com',
-                           link)
-          link = re.sub(pattern[0], pattern[1],
-                        link)  # replace the old string with the new string
+          base_domain_pattern = re.escape(rss_base_domain)
+          link = re.sub(pattern, 'https://fxtwitter.com', link)
+#         link = re.sub(pattern[0], pattern[1],                 link)  # replace the old string with the new string
           last_link=link    
           message = f"🧸| **{latest.title}**\n{link}"
           message = re.sub(r'<[^>]*>', '', message)
