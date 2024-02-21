@@ -157,7 +157,7 @@ def prepare_specific_rss(number: int):
           message = re.sub(r'<[^>]*>', '', message)
           message = re.sub("🧸", emote_to_put_at_message_start, message)
           message = re.sub("@Hobbyfiguras: ", '', message)
-          message = re.sub("https://nitter.uni-sonia.com", 'https://fxtwitter.com',
+          message = re.sub(rss_url, 'https://fxtwitter.com',
                            message)
     return message
   except URLError as e:
