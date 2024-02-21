@@ -22,7 +22,8 @@ pattern = (r"twitter\.com", "fxtwitter.com"
            )  # change this to the (old, new) strings to replace
 last_link = ""
 last_message = None
-rss_url = "https://nitter.esmailelbob.xyz/hobbyfiguras/rss"
+rss_base_domain = "https://nitter.esmailelbob.xyz"
+rss_account = "/hobbyfiguras/rss"
 #"https://nitter.uni-sonia.com/Hobbyfiguras/rss"  # change this to your RSS feed URL
 channel_ids = [1059813170589479016, 1072888000507285524,1189005278797115472
                ]  # change this to your channel ID
@@ -145,12 +146,12 @@ def prepare_specific_rss(number: int):
   global last_message
   message = last_message
   try:
-    feed = feedparser.parse(rss_url)  # parse the RSS feed
+    feed = feedparser.parse(rss_base_domain+rss_account)  # parse the RSS feed
     if feed.entries:  # check if there are any entries
         if 0 <= number < len(feed.entries):  # validate the number
           latest = feed.entries[number]  # get the latest entry
           link = latest.link  # get the link
-          link = re.sub(rss_url, 'https://fxtwitter.com',
+          link = re.sub(rss_base_domain, 'https://fxtwitter.com',
                            link)
           link = re.sub(pattern[0], pattern[1],
                         link)  # replace the old string with the new string
