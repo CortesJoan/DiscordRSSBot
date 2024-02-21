@@ -146,7 +146,8 @@ def prepare_specific_rss(number: int):
   global last_message
   message = last_message
   try:
-    feed = feedparser.parse(rss_base_domain+rss_account)  # parse the RSS feed
+    final_url= rss_base_domain+rss_account
+    feed = feedparser.parse(final_url)  # parse the RSS feed
     if feed.entries:  # check if there are any entries
         if 0 <= number < len(feed.entries):  # validate the number
           latest = feed.entries[number]  # get the latest entry
@@ -160,8 +161,7 @@ def prepare_specific_rss(number: int):
           message = re.sub(r'<[^>]*>', '', message)
           message = re.sub("🧸", emote_to_put_at_message_start, message)
           message = re.sub("@Hobbyfiguras: ", '', message)
-          message = re.sub(rss_url, 'https://fxtwitter.com',
-                           message)
+      #    message = re.sub(rss_url, 'https://fxtwitter.com',                    message)
     return message
   except URLError as e:
     print("Error while parsing RSS feed: ", e)
