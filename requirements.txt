@@ -12,5 +12,3 @@ multidict
 selenium
 six
 urllib3
-yarl
-python3-dev
