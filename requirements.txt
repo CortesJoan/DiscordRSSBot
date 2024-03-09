@@ -2,12 +2,3 @@ flask
 discord
 feedparser
 firebase_admin
-async-timeout==3.0.1
-attrs==20.3.0
-chardet==3.0.4
-discord.py==1.5.1
-idna
-multidict
-selenium
-six
-urllib3
