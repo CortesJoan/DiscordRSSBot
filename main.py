@@ -24,7 +24,7 @@ pattern = (r"twitter\.com", "fxtwitter.com"
            )  # change this to the (old, new) strings to replace
 last_link = ""
 last_message = None
-rss_base_domain = "http://nitter.esmailelbob.xyz"
+rss_base_domain = "https://nitter.privacydev.net/"
 rss_account = "/hobbyfiguras/rss"
 #"https://nitter.uni-sonia.com/Hobbyfiguras/rss"  # change this to your RSS feed URL
 channel_ids = [1059813170589479016, 1072888000507285524,1189005278797115472
