@@ -192,4 +192,3 @@ print("the saved message"+last_message + "with link: " + last_link)
 client.run(
     os.environ.get("TOKEN")
 )
-bot.init()
