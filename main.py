@@ -16,7 +16,6 @@ from firebase_admin import credentials
 from firebase_admin import db
 import json
 from flask import redirect
-from bot import Bot
 
 interval = 10  # change this to the number of seconds between each check
 emote_to_put_at_message_start = "<:Yossixhehe:1109926657613103154>"
