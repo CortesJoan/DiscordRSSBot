@@ -189,7 +189,7 @@ def load_last_link():
     return bot_data_ref.get()["last_link"]
 
 # Inicializar la lista sent_links en el inicio del bot
-sent_links = []
+sent_links  = list()
 
 # Cargar los enlaces enviados anteriormente desde Firebase
 def load_sent_links():
