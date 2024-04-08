@@ -50,6 +50,114 @@ if not bot_data_ref.child("last_message").get():
     bot_data_ref.child("last_message").set("")
 if not bot_data_ref.child("last_link").get():
     bot_data_ref.child("last_link").set("")
+
+
+
+@client.command()
+async def ping(ctx):
+    await ctx.send( "pong!" )
+
+async def kick(ctx, member: discord.Member):
+    try:
+        await member.kick(reason=None)
+        await ctx.send( "kicked " + member.mention )
+    except:
+        await ctx.send("bot does not have the kick members permission!")
+
+@client.command()
+async def addchannel(ctx, channel: discord.TextChannel):
+    global channel_ids
+    channel_ids.append(channel.id)
+    await ctx.send(f"Channel id {channel.id} added!" )
+
+@client.command()
+async def removechannel(ctx, channel_id: int):
+    global channel_ids
+    if channel_id in channel_ids:
+        channel_ids.remove(channel_id)
+        await ctx.send(f"Channel id {channel_id} removed!" )
+    else:
+        await ctx.send( f"Channel id {channel_id} is not in the list of channels!" )
+
+@client.command(name="command_nam", description="command_description")
+async def unique_command_name(interaction: discord.Interaction):
+    print("Done")
+
+@client.tree.command()
+async def add(interaction: discord.Interaction, first_value: int, second_value: int):
+    """Adds two numbers together."""
+    await interaction.response.send_message( f'{first_value} + {second_value} = {first_value + second_value}')
+
+
+
+
+@client.command()
+async def force_rss_get(ctx, number: int):
+    for channel_id in channel_ids:
+        channel = client.get_channel(channel_id)
+        if channel is not None:
+            new_message = prepare_specific_rss(number)
+            await channel.send(new_message)
+            print("Message sent")
+        else:
+            print(f"Could not find channel with ID {channel_id}")
+
+def prepare_new_rss():
+    global last_link
+    global last_message
+    new_messages = list()
+    try:
+        final_url = rss_base_domain + rss_account
+        feed = feedparser.parse(final_url)
+        if feed.entries:
+            for entry in feed.entries:
+                link = entry.link
+                base_domain_pattern = re.escape(rss_base_domain)
+                link = re.sub(base_domain_pattern, 'https://fxtwitter.com', link)
+                if link != last_link:
+                    message = f"🧸| {entry.title}\n{link}"
+                    message = re.sub(r'<[^>]*>', '', message)
+                    message = re.sub("🧸", emote_to_put_at_message_start, message)
+                    message = re.sub("@Hobbyfiguras: ", '', message)
+                    new_messages.append({"message": message, "link": link})
+                else:
+                    break
+        else:
+            print("There are no entries on this feed")
+    except URLError as e:
+        print("Error while parsing RSS feed: ", e)
+    return new_messages
+
+def prepare_specific_rss(number: int):
+    global last_link
+    global last_message
+    message = last_message
+    try:
+        final_url = rss_base_domain + rss_account
+        feed = feedparser.parse(final_url)
+        if feed.entries:
+            if 0 <= number < len(feed.entries):
+                latest = feed.entries[number]
+                link = latest.link
+                print(f"Link before substitution: {link}")
+                print(f"Pattern: {rss_base_domain}")
+                base_domain_pattern = re.escape(rss_base_domain)
+                link = re.sub(base_domain_pattern, 'https://fxtwitter.com', link)
+                print(f"Link after substitution: {link}")
+                last_link = link
+                message = f"🧸| {latest.title}\n{link}"
+                message = re.sub(r'<[^>]*>', '', message)
+                message = re.sub("🧸", emote_to_put_at_message_start, message)
+                message = re.sub("@Hobbyfiguras: ", '', message)
+            else:
+                print("There are no entries on this feed")
+        else:
+            print("There are no entries on this feed")
+    except URLError as e:
+        print("Error while parsing RSS feed: ", e)
+    return message
+
+
 @client.event
 async def on_ready():
     print("bot online" )
