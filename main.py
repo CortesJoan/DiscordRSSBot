@@ -190,10 +190,11 @@ def save_last_link(link):
     bot_data_ref.update({"last_link": link})
 
 def load_last_message():
-    return bot_data_ref.get("last_message", "")
+    return bot_data_ref.child("last_message").get() or ""
+
 
 def load_last_link():
-    return bot_data_ref.get("last_link", "")
+    return bot_data_ref.child("last_link").get() or ""
 
 keep_alive()
 last_message = load_last_message()
