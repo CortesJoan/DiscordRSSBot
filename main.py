@@ -123,7 +123,7 @@ async def force_rss_get(ctx, number: int):
 def prepare_new_rss():
     global last_link
     global last_message
-    new_messages = []
+    new_messages = list()
     try:
         final_url = rss_base_domain + rss_account
         feed = feedparser.parse(final_url)
