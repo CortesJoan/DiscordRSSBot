@@ -41,6 +41,13 @@ sent_links_ref = ref.child("sent_links")
 @client.event
 async def on_ready():
     print("bot online" )
+    # Crear el nodo 'sent_links' si no existe
+    if not sent_links_ref.get():
+        sent_links_ref.set({})
+    if not bot_data_ref.get():
+        bot_data_ref.set({})
+  
+    
     send_rss.start() 
 @tasks.loop(seconds=interval)
 async def send_rss():
