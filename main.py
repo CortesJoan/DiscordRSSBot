@@ -17,88 +17,65 @@ from firebase_admin import db
 import json
 from flask import redirect
 
-interval = 10  # change this to the number of seconds between each check
+interval = 10 # change this to the number of seconds between each check
 emote_to_put_at_message_start = "<:Yossixhehe:1109926657613103154>"
-pattern = (r"twitter\.com", "fxtwitter.com"
-           )  # change this to the (old, new) strings to replace
+pattern = (r"twitter.com", "fxtwitter.com" ) # change this to the (old, new) strings to replace
 last_link = ""
 last_message = None
 rss_base_domain = "https://nitter.privacydev.net"
-rss_account = "/hobbyfiguras/rss"
-# "https://nitter.uni-sonia.com/Hobbyfiguras/rss"  # change this to your RSS feed URL
-channel_ids = [1059813170589479016, 1072888000507285524, 1189005278797115472
-               ]  # change this to your channel ID
-
+rss_account = "/hobbyfiguras/rss" #"https://nitter.uni-sonia.com/Hobbyfiguras/rss" # change this to your RSS feed URL
+channel_ids = [1059813170589479016, 1072888000507285524,1189005278797115472 ] # change this to your channel ID
 
 intents = discord.Intents.all()
-client = commands.Bot(command_prefix='loli',
-                      intents=intents)
-# put your own prefix here
+client = commands.Bot(command_prefix='loli', intents=intents) #put your own prefix here
+
 cred_object = credentials.Certificate('./serviceAccountKey.json')
 firebase_admin.initialize_app(cred_object, {
-    'databaseURL': 'https://botfiguras-default-rtdb.europe-west1.firebasedatabase.app/'})  # Replace this with your database URL
+    'databaseURL': 'https://botfiguras-default-rtdb.europe-west1.firebasedatabase.app/'
+})  # Replace this with your database URL
+
 ref = db.reference('/')
 bot_data_ref = ref.child("last_message")
 
-
 @client.event
 async def on_ready():
-    print("bot online"
-          )  # will print "bot online" in the console when the bot is online
+    print("bot online" )
     send_rss.start()
-
 
 @client.command()
 async def ping(ctx):
-    await ctx.send(
-        "pong!"
-    )  # simple command so that when you type "!ping" the bot will respond with "pong!"
-
+    await ctx.send( "pong!" )
 
 async def kick(ctx, member: discord.Member):
     try:
         await member.kick(reason=None)
-        await ctx.send(
-            "kicked " + member.mention
-        )  # simple kick command to demonstrate how to get and use member mentions
+        await ctx.send( "kicked " + member.mention )
     except:
         await ctx.send("bot does not have the kick members permission!")
 
-
 @client.command()
 async def addchannel(ctx, channel: discord.TextChannel):
-    global channel_ids  # use the global variable
-    channel_ids.append(channel.id)  # add the channel id to the list
-    await ctx.send(f"Channel id {channel.id} added!"
-                   )  # send a confirmation message
-
+    global channel_ids
+    channel_ids.append(channel.id)
+    await ctx.send(f"Channel id {channel.id} added!" )
 
 @client.command()
 async def removechannel(ctx, channel_id: int):
-    global channel_ids  # use the global variable
+    global channel_ids
     if channel_id in channel_ids:
-        channel_ids.remove(channel_id)  # remove the channel id from the list
-        await ctx.send(f"Channel id {channel_id} removed!"
-                       )  # send a confirmation message
+        channel_ids.remove(channel_id)
+        await ctx.send(f"Channel id {channel_id} removed!" )
     else:
-        await ctx.send(
-            f"Channel id {channel_id} is not in the list of channels!"
-        )  # send an error message if the channel id is not in the list
-
+        await ctx.send( f"Channel id {channel_id} is not in the list of channels!" )
 
 @client.command(name="command_nam", description="command_description")
 async def unique_command_name(interaction: discord.Interaction):
     print("Done")
 
-
 @client.tree.command()
-async def add(interaction: discord.Interaction, first_value: int,
-              second_value: int):
+async def add(interaction: discord.Interaction, first_value: int, second_value: int):
     """Adds two numbers together."""
-    await interaction.response.send_message(
-        f'{first_value} + {second_value} = {first_value + second_value}')
-
-
+    await interaction.response.send_message( f'{first_value} + {second_value} = {first_value + second_value}')
 
 @tasks.loop(seconds=interval)
 async def send_rss():
@@ -106,107 +83,111 @@ async def send_rss():
     global last_message
     global last_link
     new_messages = []
-    
-    # Get the latest feed entries
-    final_url = rss_base_domain + rss_account
-    feed = feedparser.parse(final_url)
-    
-    if feed.entries:
-        # Iterate over the feed entries in reverse order
-        for entry in reversed(feed.entries):
-            link = entry.link
-            base_domain_pattern = re.escape(rss_base_domain)
-            link = re.sub(base_domain_pattern, 'https://fxtwitter.com', link)
-            
-            # Check if the link has already been processed
-            if link != last_link:
-                message = f"🧸| **{entry.title}**\n{link}"
-                message = re.sub(r'<[^>]*>', '', message)
-                message = re.sub("🧸", emote_to_put_at_message_start, message)
-                message = re.sub("@Hobbyfiguras: ", '', message)
-                new_messages.append(message)
+    for channel_id in channel_ids:
+        channel = client.get_channel(channel_id)
+        if channel is not None:
+            new_messages = prepare_new_rss()
+            if new_messages:
+                for new_message in new_messages:
+                    if last_link != new_message["link"]:
+                        print("New content to send")
+                        await channel.send(new_message["message"])
+                        print("Message sent")
+                    else:
+                        print("No new content to send")
             else:
-                break
-        
-        last_link = feed.entries[-1].link  # Update the last processed link
-    
-    if new_messages:
-        for channel_id in channel_ids:  # iterate over the channel IDs
-            channel = client.get_channel(channel_id)  # get the discord channel for each ID
-            if channel is not None:  # check if the channel is valid
-                for message in reversed(new_messages):
-                    await channel.send(message)  # send each new message to the channel
-                    print("Message sent")
-            else:  # handle the error
-                print(f"Could not find channel with ID {channel_id}")
-        
-        last_message = new_messages[-1]  # Update the last sent message
-        save_last_message(last_message)
-    else:
-        print("No new content to send")
-
+                print("No new content to send")
+        else:
+            print(```python
+f"Could not find channel with ID {channel_id}")
+    last_message = new_messages[-1]["message"] if new_messages else last_message
+    last_link = new_messages[-1]["link"] if new_messages else last_link
+    save_last_message(last_message)
+    save_last_link(last_link)
+    print(last_message)
     await asyncio.sleep(interval)
-
 
 @client.command()
 async def force_rss_get(ctx, number: int):
-    for channel_id in channel_ids:  # iterate over the channel IDs
-        channel = client.get_channel(
-            channel_id)  # get the discord channel for each ID
-        if channel is not None:  # check if the channel is valid
+    for channel_id in channel_ids:
+        channel = client.get_channel(channel_id)
+        if channel is not None:
             new_message = prepare_specific_rss(number)
-            await channel.send(new_message)  # send the message to the channel
-            print("Message sended")
-        else:  # handle the error
+            await channel.send(new_message)
+            print("Message sent")
+        else:
             print(f"Could not find channel with ID {channel_id}")
 
+def prepare_new_rss():
+    global last_link
+    global last_message
+    new_messages = []
+    try:
+        final_url = rss_base_domain + rss_account
+        feed = feedparser.parse(final_url)
+        if feed.entries:
+            for entry in feed.entries:
+                link = entry.link
+                base_domain_pattern = re.escape(rss_base_domain)
+                link = re.sub(base_domain_pattern, 'https://fxtwitter.com', link)
+                if link != last_link:
+                    message = f"🧸| {entry.title}\n{link}"
+                    message = re.sub(r'<[^>]*>', '', message)
+                    message = re.sub("🧸", emote_to_put_at_message_start, message)
+                    message = re.sub("@Hobbyfiguras: ", '', message)
+                    new_messages.append({"message": message, "link": link})
+                else:
+                    break
+        else:
+            print("There are no entries on this feed")
+    except URLError as e:
+        print("Error while parsing RSS feed: ", e)
+    return new_messages
 
 def prepare_specific_rss(number: int):
     global last_link
     global last_message
     message = last_message
     try:
-        final_url = rss_base_domain+rss_account
+        final_url = rss_base_domain + rss_account
         feed = feedparser.parse(final_url)
         if feed.entries:
-            if 0 <= number < len(feed.entries):  # validate the number
-                latest = feed.entries[number]  # get the latest entry
-                link = latest.link  # get the link
+            if 0 <= number < len(feed.entries):
+                latest = feed.entries[number]
+                link = latest.link
                 print(f"Link before substitution: {link}")
                 print(f"Pattern: {rss_base_domain}")
                 base_domain_pattern = re.escape(rss_base_domain)
-                link = re.sub(base_domain_pattern,'https://fxtwitter.com', link)
+                link = re.sub(base_domain_pattern, 'https://fxtwitter.com', link)
                 print(f"Link after substitution: {link}")
                 last_link = link
-                message = f"🧸| **{latest.title}**\n{link}"
+                message = f"🧸| {latest.title}\n{link}"
                 message = re.sub(r'<[^>]*>', '', message)
                 message = re.sub("🧸", emote_to_put_at_message_start, message)
                 message = re.sub("@Hobbyfiguras: ", '', message)
+            else:
+                print("There are no entries on this feed")
         else:
             print("There are no entries on this feed")
-        return message
     except URLError as e:
         print("Error while parsing RSS feed: ", e)
-        return message
- 
+    return message
 
-
-# Add this code at the end of your main.py file
 def save_last_message(message):
     global last_link
     bot_data_ref.update({"last_message": message})
-    bot_data_ref.update({"last_link": last_link})
 
+def save_last_link(link):
+    bot_data_ref.update({"last_link": link})
 
 def load_last_message():
     return bot_data_ref.get()["last_message"]
 
+def load_last_link():
+    return bot_data_ref.get()["last_link"]
 
-# run the bot with your token
 keep_alive()
 last_message = load_last_message()
-last_link = bot_data_ref.get()["last_link"]
-print("the saved message"+last_message + "with link: " + last_link)
-client.run(
-    os.environ.get("TOKEN")
-)
+last_link = load_last_link()
+print("the saved message" + last_message + "with link: " + last_link)
+client.run(os.environ.get("TOKEN"))
