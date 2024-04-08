@@ -46,8 +46,10 @@ async def on_ready():
         sent_links_ref.set({})
     if not bot_data_ref.get():
         bot_data_ref.set({})
-  
-    
+    if not bot_data_ref.child("last_message").get():
+        bot_data_ref.child("last_message").set("")
+    if not bot_data_ref.child("last_link").get():
+        bot_data_ref.child("last_link").set("")
     send_rss.start() 
 @tasks.loop(seconds=interval)
 async def send_rss():
