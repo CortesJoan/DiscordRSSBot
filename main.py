@@ -27,7 +27,8 @@ last_message = None
 rss_base_domain = "https://nitter.privacydev.net"
 rss_account = "/hobbyfiguras/rss" #"https://nitter.uni-sonia.com/Hobbyfiguras/rss" # change this to your RSS feed URL
 channel_ids = [1059813170589479016, 1072888000507285524,1189005278797115472 ] # change this to your channel ID
-
+# Inicializar la lista sent_links en el inicio del bot
+sent_links  = list()
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix='loli', intents=intents) #put your own prefix here
 
@@ -188,8 +189,7 @@ def load_last_message():
 def load_last_link():
     return bot_data_ref.get()["last_link"]
 
-# Inicializar la lista sent_links en el inicio del bot
-sent_links  = list()
+
 
 # Cargar los enlaces enviados anteriormente desde Firebase
 def load_sent_links():
