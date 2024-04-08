@@ -17,6 +17,8 @@ from firebase_admin import db
 import json
 from flask import redirect
 
+MAX_SENT_LINKS = 100  # Número máximo de enlaces enviados a mantener en memoria
+
 interval = 10 # change this to the number of seconds between each check
 emote_to_put_at_message_start = "<:Yossixhehe:1109926657613103154>"
 pattern = (r"twitter.com", "fxtwitter.com" ) # change this to the (old, new) strings to replace
@@ -82,29 +84,29 @@ async def send_rss():
     print("Time to check")
     global last_message
     global last_link
-    new_messages = []
-    for channel_id in channel_ids:
-        channel = client.get_channel(channel_id)
-        if channel is not None:
-            new_messages = prepare_new_rss()
-            if new_messages:
+    global sent_links
+    new_messages = prepare_new_rss()
+    if new_messages:
+        for channel_id in channel_ids:
+            channel = client.get_channel(channel_id)
+            if channel is not None:
                 for new_message in new_messages:
-                    if last_link != new_message["link"]:
+                    if new_message["link"] not in sent_links:
                         print("New content to send")
                         await channel.send(new_message["message"])
                         print("Message sent")
+                        sent_links.append(new_message["link"])
+                        if len(sent_links) > MAX_SENT_LINKS:
+                            sent_links.pop(0)  # Eliminar el enlace más antiguo
                     else:
                         print("No new content to send")
             else:
-                print("No new content to send")
-        else:
-            print(```python
-f"Could not find channel with ID {channel_id}")
-    last_message = new_messages[-1]["message"] if new_messages else last_message
-    last_link = new_messages[-1]["link"] if new_messages else last_link
-    save_last_message(last_message)
-    save_last_link(last_link)
-    print(last_message)
+                print(f"Could not find channel with ID {channel_id}")
+        last_message = new_messages[-1]["message"]
+        last_link = new_messages[-1]["link"]
+        save_last_message(last_message)
+        save_last_link(last_link)
+        print(last_message)
     await asyncio.sleep(interval)
 
 @client.command()
@@ -185,6 +187,26 @@ def load_last_message():
 
 def load_last_link():
     return bot_data_ref.get()["last_link"]
+
+# Inicializar la lista sent_links en el inicio del bot
+sent_links = []
+
+# Cargar los enlaces enviados anteriormente desde Firebase
+def load_sent_links():
+    sent_links_data = bot_data_ref.get("sent_links", [])
+    return sent_links_data[:MAX_SENT_LINKS]  # Limitar a los últimos MAX_SENT_LINKS enlaces
+
+# Guardar los enlaces enviados en Firebase
+def save_sent_links(sent_links):
+    bot_data_ref.update({"sent_links": sent_links})
+
+# Cargar los enlaces enviados anteriormente al iniciar el bot
+sent_links = load_sent_links()
+
+# Guardar los enlaces enviados al salir del bot
+@client.event
+async def on_disconnect():
+    save_sent_links(sent_links)
 
 keep_alive()
 last_message = load_last_message()
