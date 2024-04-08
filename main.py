@@ -1,6 +1,3 @@
-Aquí está el código completo con la última versión:
-
-```python
 import keep_alive
 import discord
 import os
