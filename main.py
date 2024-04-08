@@ -17,6 +17,7 @@ from firebase_admin import db
 import json
 from flask import redirect
 from urllib.parse import quote
+import uuid
 
 interval = 10 # change this to the number of seconds between each check
 emote_to_put_at_message_start = "<:Yossixhehe:1109926657613103154>"
@@ -86,7 +87,7 @@ async def unique_command_name(interaction: discord.Interaction):
 async def add(interaction: discord.Interaction, first_value: int, second_value: int):
     """Adds two numbers together."""
     await interaction.response.send_message( f'{first_value} + {second_value} = {first_value + second_value}')
-
+ 
 @tasks.loop(seconds=interval)
 async def send_rss():
     print("Time to check")
@@ -99,12 +100,11 @@ async def send_rss():
             if channel is not None:
                 for new_message in new_messages:
                     link = new_message["link"]
-                    encoded_link = quote(link, safe='')  # Codificar el enlace
-                    if not sent_links_ref.child(encoded_link).get():  # Verificar si el enlace ya ha sido enviado
+                    if not sent_links_ref.child(str(uuid.uuid4())).get():  # Generate a unique ID for the link
                         print("New content to send")
                         await channel.send(new_message["message"])
                         print("Message sent")
-                        sent_links_ref.child(encoded_link).set(True)  # Marcar el enlace como enviado
+                        sent_links_ref.child(str(uuid.uuid4())).set(link)  # Store the link with the unique ID
                     else:
                         print("No new content to send")
             else:
