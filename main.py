@@ -25,28 +25,26 @@ last_link = ""
 last_message = None
 rss_base_domain = "https://nitter.privacydev.net"
 rss_account = "/hobbyfiguras/rss"
-#"https://nitter.uni-sonia.com/Hobbyfiguras/rss"  # change this to your RSS feed URL
-channel_ids = [1059813170589479016, 1072888000507285524,1189005278797115472
+# "https://nitter.uni-sonia.com/Hobbyfiguras/rss"  # change this to your RSS feed URL
+channel_ids = [1059813170589479016, 1072888000507285524, 1189005278797115472
                ]  # change this to your channel ID
-
-
-
 
 
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix='loli',
                       intents=intents)
-                      #put your own prefix here
+# put your own prefix here
 cred_object = credentials.Certificate('./serviceAccountKey.json')
 firebase_admin.initialize_app(cred_object, {
-    'databaseURL': 'https://botfiguras-default-rtdb.europe-west1.firebasedatabase.app/'}) # Replace this with your database URL
+    'databaseURL': 'https://botfiguras-default-rtdb.europe-west1.firebasedatabase.app/'})  # Replace this with your database URL
 ref = db.reference('/')
 bot_data_ref = ref.child("last_message")
+
 
 @client.event
 async def on_ready():
   print("bot online"
-        )  #will print "bot online" in the console when the bot is online
+        )  # will print "bot online" in the console when the bot is online
   send_rss.start()
 
 
@@ -54,7 +52,7 @@ async def on_ready():
 async def ping(ctx):
   await ctx.send(
       "pong!"
-  )  #simple command so that when you type "!ping" the bot will respond with "pong!"
+  )  # simple command so that when you type "!ping" the bot will respond with "pong!"
 
 
 async def kick(ctx, member: discord.Member):
@@ -62,7 +60,7 @@ async def kick(ctx, member: discord.Member):
     await member.kick(reason=None)
     await ctx.send(
         "kicked " + member.mention
-    )  #simple kick command to demonstrate how to get and use member mentions
+    )  # simple kick command to demonstrate how to get and use member mentions
   except:
     await ctx.send("bot does not have the kick members permission!")
 
@@ -123,7 +121,6 @@ async def send_rss():
       print(f"Could not find channel with ID {channel_id}")
   last_message = new_message
   save_last_message(last_message)
-  
 
   print(last_message)
   await asyncio.sleep(interval)
@@ -147,38 +144,65 @@ def prepare_specific_rss(number: int):
   global last_message
   message = last_message
   try:
-    final_url= rss_base_domain+rss_account
-    feed = feedparser.parse(final_url)   
-    if feed.entries:   
+    final_url = rss_base_domain+rss_account
+    feed = feedparser.parse(final_url)
+    if feed.entries:
         if 0 <= number < len(feed.entries):  # validate the number
           latest = feed.entries[number]  # get the latest entry
           link = latest.link  # get the link
           print(f"Link before substitution: {link}")
-          print(f"Pattern: {rss_base_domain}")    
+          print(f"Pattern: {rss_base_domain}")
           base_domain_pattern = re.escape(rss_base_domain)
           link = re.sub(base_domain_pattern, 'https://fxtwitter.com', link)
           print(f"Link after substitution: {link}")
 
-          last_link=link    
+          last_link = link
           message = f"🧸| **{latest.title}**\n{link}"
           message = re.sub(r'<[^>]*>', '', message)
           message = re.sub("🧸", emote_to_put_at_message_start, message)
           message = re.sub("@Hobbyfiguras: ", '', message)
       #    message = re.sub(rss_url, 'https://fxtwitter.com',                    message)
-    else: 
-          print("There are no entries on this feed")
+    else:
+        print("There are no entries on this feed")
     return message
   except URLError as e:
     print("Error while parsing RSS feed: ", e)
     return message
 
- 
+
+def prepare_specific_rss(last_published_link):
+    new_messages = []
+    try:
+        final_url = rss_base_domain + rss_account
+        feed = feedparser.parse(final_url)
+        if feed.entries:
+            for entry in feed.entries:
+                link = entry.link
+                base_domain_pattern = re.escape(rss_base_domain)
+                link = re.sub(base_domain_pattern,
+                              'https://fxtwitter.com', link)
+
+
+  if link != last_published_link:   
+message = f"🧸| {entry.title}\n{link}"  
+message = re.sub(r'<[^>]*>', '', message)  
+message = re.sub("🧸", emote_to_put_at_message_start, message)  
+message = re.sub("@Hobbyfiguras: ", '', message)  
+new_messages.append((message, link))  
+else:  
+break  
+else:  
+print("There are no entries on this feed")  
+excep  t URLError as e:
+print("Error while parsing RSS feed: ", e)
+return new_messages
+
+
 # Add this code at the end of your main.py file
 def save_last_message(message):
     global last_link
     bot_data_ref.update({"last_message": message})
     bot_data_ref.update({"last_link": last_link})
-
 
 
 def load_last_message():
@@ -188,7 +212,7 @@ def load_last_message():
 # run the bot with your token
 keep_alive()
 last_message = load_last_message()
-last_link= bot_data_ref.get()["last_link"]
+last_link = bot_data_ref.get()["last_link"]
 print("the saved message"+last_message + "with link: " + last_link)
 client.run(
     os.environ.get("TOKEN")
