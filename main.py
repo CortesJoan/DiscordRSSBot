@@ -26,7 +26,7 @@ last_link = ""
 last_message = None
 rss_base_domain = "https://nitter.privacydev.net"
 rss_account = "/hobbyfiguras/rss" #"https://nitter.uni-sonia.com/Hobbyfiguras/rss" # change this to your RSS feed URL
-channel_ids = [1059813170589479016, 1072888000507285524,1189005278797115472 ] # change this to your channel ID
+channel_ids = [1059813170589479016, 1072888000507285524   ] # change this to your channel ID
 
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix='loli', intents=intents) #put your own prefix here
@@ -156,31 +156,26 @@ def prepare_new_rss():
 def prepare_specific_rss(number: int):
     global last_link
     global last_message
-    message = last_message
+    new_messages = []
     try:
         final_url = rss_base_domain + rss_account
         feed = feedparser.parse(final_url)
         if feed.entries:
-            if 0 <= number < len(feed.entries):
-                latest = feed.entries[number]
-                link = latest.link
-                print(f"Link before substitution: {link}")
-                print(f"Pattern: {rss_base_domain}")
+            for entry in feed.entries:
+                link = entry.link
                 base_domain_pattern = re.escape(rss_base_domain)
                 link = re.sub(base_domain_pattern, 'https://fxtwitter.com', link)
-                print(f"Link after substitution: {link}")
-                last_link = link
-                message = f"🧸| {latest.title}\n{link}"
-                message = re.sub(r'<[^>]*>', '', message)
-                message = re.sub("🧸", emote_to_put_at_message_start, message)
-                message = re.sub("@Hobbyfiguras: ", '', message)
-            else:
-                print("There are no entries on this feed")
-        else:
-            print("There are no entries on this feed")
+                if link != last_link:
+                    message = f"🧸| {entry.title}\n{link}"
+                    message = re.sub(r'<[^>]*>', '', message)
+                    message = re.sub("🧸", emote_to_put_at_message_start, message)
+                    message = re.sub("@Hobbyfiguras: ", '', message)
+                    new_messages.append({"message": message, "link": link})
+                else:
+                    break
     except URLError as e:
         print("Error while parsing RSS feed: ", e)
-    return message
+    return new_messages
 
 def save_last_message(message):
     global last_link
