@@ -152,27 +152,28 @@ def prepare_new_rss():
         print("Error while parsing RSS feed: ", e)
     return new_messages
 
-def prepare_specific_rss(number: int):
-    global last_link
-    global last_message
+def prepare_new_rss():
     new_messages = []
     try:
         final_url = rss_base_domain + rss_account
         feed = feedparser.parse(final_url)
         if feed.entries:
+            sent_links = [link for link in sent_links_ref.get().values()]
             for entry in feed.entries:
                 link = entry.link
                 base_domain_pattern = re.escape(rss_base_domain)
                 link = re.sub(base_domain_pattern, 'https://fxtwitter.com', link)
-                if link != last_link:
+                if link not in sent_links:
                     message = f"🧸| {entry.title}\n{link}"
                     message = re.sub(r'<[^>]*>', '', message)
                     message = re.sub("🧸", emote_to_put_at_message_start, message)
                     message = re.sub("@Hobbyfiguras: ", '', message)
                     new_messages.append({"message": message, "link": link})
-                else:
-                    break
-    except URLError as e:
+            
+            # Update sent_links with new links
+            for new_message in new_messages:
+                sent_links_ref.push().set(new_message["link"])
+    except Exception as e:
         print("Error while parsing RSS feed: ", e)
     return new_messages
 
