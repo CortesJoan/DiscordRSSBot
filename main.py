@@ -24,7 +24,7 @@ emote_to_put_at_message_start = "<:Yossixhehe:1109926657613103154>"
 pattern = (r"twitter.com", "fxtwitter.com" ) # change this to the (old, new) strings to replace
 last_link = ""
 last_message = None
-rss_base_domain = "https://nitter.privacydev.net"
+rss_base_domains = "https://nitter.privacydev.net", "https://nitter.poast.org/"
 rss_account = "/hobbyfiguras/rss" #"https://nitter.uni-sonia.com/Hobbyfiguras/rss" # change this to your RSS feed URL
 channel_ids = [] # change this to your channel ID
 
@@ -143,25 +143,26 @@ async def force_rss_get(ctx, number: int):
 def prepare_new_rss():
     new_messages = []
     try:
-        final_url = rss_base_domain + rss_account
-        feed = feedparser.parse(final_url)
-        if feed.entries:
-            sent_links_data = sent_links_ref.get()
-            sent_links = [link for link in sent_links_data.values()] if sent_links_data else []
-            for entry in feed.entries:
-                link = entry.link
-                base_domain_pattern = re.escape(rss_base_domain)
-                link = re.sub(base_domain_pattern, 'https://fxtwitter.com', link)
-                if link not in sent_links:
-                    message = f"🧸| {entry.title}\n{link}"
-                    message = re.sub(r'<[^>]*>', '', message)
-                    message = re.sub("🧸", emote_to_put_at_message_start, message)
-                    message = re.sub("@Hobbyfiguras: ", '', message)
-                    new_messages.append({"message": message, "link": link})
-            
-            # Update sent_links with new links
-            for new_message in new_messages:
-                sent_links_ref.push().set(new_message["link"])
+        for rss_base_domain in rss_base_domains:
+            final_url = rss_base_domain + rss_account
+            feed = feedparser.parse(final_url)
+            if feed.entries:
+                sent_links_data = sent_links_ref.get()
+                sent_links = [link for link in sent_links_data.values()] if sent_links_data else []
+                for entry in feed.entries:
+                    link = entry.link
+                    base_domain_pattern = re.escape(rss_base_domain)
+                    link = re.sub(base_domain_pattern, 'https://fxtwitter.com', link)
+                    if link not in sent_links:
+                        message = f"🧸| {entry.title}\n{link}"
+                        message = re.sub(r'<[^>]*>', '', message)
+                        message = re.sub("🧸", emote_to_put_at_message_start, message)
+                        message = re.sub("@Hobbyfiguras: ", '', message)
+                        new_messages.append({"message": message, "link": link})
+                
+                # Update sent_links with new links
+                for new_message in new_messages:
+                    sent_links_ref.push().set(new_message["link"])
     except Exception as e:
         print("Error while parsing RSS feed: ", e)
     return new_messages
