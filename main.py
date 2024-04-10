@@ -26,7 +26,7 @@ last_link = ""
 last_message = None
 rss_base_domain = "https://nitter.privacydev.net"
 rss_account = "/hobbyfiguras/rss" #"https://nitter.uni-sonia.com/Hobbyfiguras/rss" # change this to your RSS feed URL
-channel_ids = [1059813170589479016, 1072888000507285524   ] # change this to your channel ID
+channel_ids = [] # change this to your channel ID
 
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix='loli', intents=intents) #put your own prefix here
@@ -51,6 +51,15 @@ sent_links_ref = ref.child("sent_links")
 @client.event
 async def on_ready():
     print("bot online" )
+    # Retrieve channel IDs from environment variables
+    channel_id_env = os.environ.get("CHANNEL_IDS")
+    if channel_id_env:
+        global channel_ids
+        channel_ids = [int(id.strip()) for id in channel_id_env.split(",")]
+        print(f"Channel IDs loaded from environment variables: {channel_ids}")
+    else:
+        print("No channel IDs found in environment variables.")
+    
     send_rss.start()
 
 @client.command()
