@@ -24,9 +24,9 @@ emote_to_put_at_message_start = "<:Yossixhehe:1109926657613103154>"
 pattern = (r"twitter.com", "fxtwitter.com" ) # change this to the (old, new) strings to replace
 last_link = ""
 last_message = None
-rss_base_domains = "https://nitter.privacydev.net", "https://nitter.poast.org/"
-rss_account = "/hobbyfiguras/rss" #"https://nitter.uni-sonia.com/Hobbyfiguras/rss" # change this to your RSS feed URL
-channel_ids = [] # change this to your channel ID
+rss_base_domains = "https://nitter.privacydev.net", "https://nitter.poast.org"
+rss_account = "/hobbyfiguras/rss"   
+channel_ids = []  
 
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix='loli', intents=intents) #put your own prefix here
@@ -126,17 +126,6 @@ async def send_rss():
     else:
         print("No new messages to send")
     await asyncio.sleep(interval)
-
-@client.command()
-async def force_rss_get(ctx, number: int):
-    for channel_id in channel_ids:
-        channel = client.get_channel(channel_id)
-        if channel is not None:
-            new_message = prepare_specific_rss(number)
-            await channel.send(new_message)
-            print("Message sent")
-        else:
-            print(f"Could not find channel with ID {channel_id}")
 
  
 
