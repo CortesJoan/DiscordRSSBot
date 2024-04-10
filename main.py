@@ -146,7 +146,8 @@ def prepare_new_rss():
         final_url = rss_base_domain + rss_account
         feed = feedparser.parse(final_url)
         if feed.entries:
-            sent_links = [link for link in sent_links_ref.get().values()]
+            sent_links_data = sent_links_ref.get()
+            sent_links = [link for link in sent_links_data.values()] if sent_links_data else []
             for entry in feed.entries:
                 link = entry.link
                 base_domain_pattern = re.escape(rss_base_domain)
