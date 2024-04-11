@@ -138,18 +138,16 @@ def prepare_new_rss():
             if feed.entries:
                 sent_links_data = sent_links_ref.get()
                 sent_links = [link for link in sent_links_data.values()] if sent_links_data else []
-                for entry in reversed(feed.entries)::
-                link = entry.link
-                base_domain_pattern = re.escape(rss_base_domain)
-                link = re.sub(base_domain_pattern, 'https://fxtwitter.com', link)
-                if link not in sent_links:
-                    message = f"🧸| {entry.title}\n{link}"
-                    message = re.sub(r'<[^>]*>', '', message)
-                    message = re.sub("🧸", emote_to_put_at_message_start, message)
-                    message = re.sub("@Hobbyfiguras: ", '', message)
-                    new_messages.append({"message": message, "link": link})
-            
-                # Update sent_links with new links
+                for entry in reversed(feed.entries):
+                    link = entry.link
+                    base_domain_pattern = re.escape(rss_base_domain)
+                    link = re.sub(base_domain_pattern, 'https://fxtwitter.com', link)
+                    if link not in sent_links:
+                        message = f"🧸| {entry.title}\n{link}"
+                        message = re.sub(r'<[^>]*>', '', message)
+                        message = re.sub("🧸", emote_to_put_at_message_start, message)
+                        message = re.sub("@Hobbyfiguras: ", '', message)
+                        new_messages.append({"message": message, "link": link})
                 for new_message in new_messages:
                     sent_links_ref.push().set(new_message["link"])
     except Exception as e:
