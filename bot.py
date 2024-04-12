@@ -4,19 +4,20 @@ from discord.ext import commands, tasks
 from rss_feed import RSSFeed
 from firebase_service import FirebaseService
 class FigurasBot:
+    interval = 10
     def __init__(self, client):
         self.client = client
         self.rss_feed = RSSFeed()
         self.firebase_service = FirebaseService()
         self.channel_ids = self.load_channel_ids()
-        self.interval = 10
-   
+    
 
     def run(self):
         self.client.event(self.on_ready)
-        self.client.command()(self.addchannel)
-        self.client.command()(self.removechannel)
-        self.client.command()(self.getrssentry) 
+        self.client.command(name='addchannel')(self.addchannel)
+        self.client.command(name='removechannel')(self.removechannel)
+        self.client.command(name='getrssentry')(self.getrssentry)
+        self.client.command(name='pauserss')(self.pause_rss)
         self.client.run(os.environ.get("TOKEN"))
 
     async def on_ready(self):
@@ -37,7 +38,7 @@ class FigurasBot:
         else:
             await ctx.send(f"Channel id {channel_id} is not in the list of channels!")
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(seconds=interval)
     async def send_rss(self):
         new_messages = self.rss_feed.get_new_messages()
         if new_messages:
@@ -66,3 +67,19 @@ class FigurasBot:
             await ctx.send(entry["message"])
         else:
             await ctx.send(f"Entry number {entry_number} not found.")
+
+    @commands.command(name='startrss')
+    async def start_rss(self, ctx):
+        try:
+            self.send_rss.start()
+            await ctx.send("RSS task has been started.")
+        except RuntimeError as e:
+            if str(e) == "Task is already started":
+                await ctx.send("RSS task is already running.")
+            else:
+                raise e
+
+    @commands.command(name='pauserss')
+    async def pause_rss(self, ctx):
+        self.send_rss.cancel()
+        await ctx.send("RSS task has been paused.")
