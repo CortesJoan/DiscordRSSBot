@@ -22,10 +22,11 @@ class FigurasBot:
     async def on_ready(self):
         self.send_rss.start()
         self.client.command(name='pauserss')(self.pause_rss)
+        self.client.command(name='ping')(self)
         
         print("bot online")
-    @commands.command(name='ping')
-    async def ping(ctx):
+    
+    async def ping(self,ctx):
         await ctx.send("pong!")
 
     async def addchannel(self, ctx, channel: discord.TextChannel):
