@@ -13,7 +13,6 @@ class FigurasBot:
 
     def run(self):
         self.client.event(self.on_ready)
-        self.client.command()(self.ping)
         self.client.command()(self.addchannel)
         self.client.command()(self.removechannel)
         self.client.command()(self.getrssentry) 
@@ -22,7 +21,7 @@ class FigurasBot:
 
     async def on_ready(self):
         print("bot online")
-
+    @commands.command()
     async def ping(self, ctx):
         await ctx.send("pong!")
 
