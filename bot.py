@@ -10,13 +10,13 @@ class FigurasBot:
         self.firebase_service = FirebaseService()
         self.channel_ids = self.load_channel_ids()
         self.interval = 10
+        self.send_rss.start()
 
     def run(self):
         self.client.event(self.on_ready)
         self.client.command()(self.addchannel)
         self.client.command()(self.removechannel)
         self.client.command()(self.getrssentry) 
-        self.send_rss.start()
         self.client.run(os.environ.get("TOKEN"))
 
     async def on_ready(self):
