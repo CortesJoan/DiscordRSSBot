@@ -11,3 +11,6 @@ class FigurasBot(commands.Bot):
     @commands.command(name='ping')
     async def ping(self, ctx):
         await ctx.send("pong!")
+    
+    def run(self):
+      super().run(os.environ.get("TOKEN"))
