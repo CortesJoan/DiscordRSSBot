@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands, tasks
 from rss_feed import RSSFeed
 from firebase_service import FirebaseService
-class FigurasBot:
+class FigurasBot(commands.Bot):
     interval = 10
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
