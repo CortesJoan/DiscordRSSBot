@@ -6,8 +6,7 @@ from keep_alive import keep_alive
 
 def main():
     intents = discord.Intents.all()
-    client = commands.Bot(command_prefix='loli-', intents=intents)
-    bot = FigurasBot(client)
+    bot = FigurasBot(intents=intents)
     bot.run()
 
 if __name__ == "__main__":

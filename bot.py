@@ -6,7 +6,7 @@ from firebase_service import FirebaseService
 class FigurasBot(commands.Bot):
     interval = 10
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, command_prefix='loli-', **kwargs)
         self.rss_feed = RSSFeed()
         self.firebase_service = FirebaseService()
         self.channel_ids = self.load_channel_ids()
