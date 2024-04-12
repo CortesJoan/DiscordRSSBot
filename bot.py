@@ -1,8 +1,8 @@
 import os
+import discord
 from discord.ext import commands, tasks
 from rss_feed import RSSFeed
 from firebase_service import FirebaseService
-
 class FigurasBot:
     def __init__(self, client):
         self.client = client
