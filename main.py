@@ -1,4 +1,5 @@
 import os
+import discord
 from discord.ext import commands
 from bot import FigurasBot
 from keep_alive import keep_alive
