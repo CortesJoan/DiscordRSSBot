@@ -5,28 +5,24 @@ from rss_feed import RSSFeed
 from firebase_service import FirebaseService
 class FigurasBot:
     interval = 10
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.rss_feed = RSSFeed()
         self.firebase_service = FirebaseService()
         self.channel_ids = self.load_channel_ids()
+        
+        
     
-
     def run(self):
         self.client.event(self.on_ready)
-        self.client.command(name='addchannel')(self.addchannel)
-        self.client.command(name='removechannel')(self.removechannel)
-        self.client.command(name='getrssentry')(self.getrssentry)
         self.client.run(os.environ.get("TOKEN"))
 
     async def on_ready(self):
         self.send_rss.start()
-        self.client.command(name='pauserss')(self.pause_rss)
-        self.client.command(name='ping')(self)
-        
         print("bot online")
     
-    async def ping(self,ctx):
+    @commands.command(name='ping')
+    async def ping(self, ctx):
         await ctx.send("pong!")
 
     async def addchannel(self, ctx, channel: discord.TextChannel):
@@ -69,8 +65,7 @@ class FigurasBot:
             await ctx.send(entry["message"])
         else:
             await ctx.send(f"Entry number {entry_number} not found.")
-
-    @commands.command(name='startrss')
+ 
     async def start_rss(self, ctx):
         try:
             self.send_rss.start()
