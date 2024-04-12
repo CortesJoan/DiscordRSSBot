@@ -9,7 +9,7 @@ def main():
     intents = discord.Intents.all()
     bot = FigurasBot(intents=intents)
     bot.run()
- 
+
 if __name__ == "__main__":
     keep_alive()
     main()
