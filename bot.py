@@ -16,6 +16,7 @@ class FigurasBot:
         self.client.command()(self.ping)
         self.client.command()(self.addchannel)
         self.client.command()(self.removechannel)
+        self.client.command()(self.getrssentry) 
         self.send_rss.start()
         self.client.run(os.environ.get("TOKEN"))
 
@@ -59,3 +60,9 @@ class FigurasBot:
             return [int(id.strip()) for id in channel_id_env.split(",")]
         else:
             return []
+    async def getrssentry(self, ctx, entry_number: int):
+        entry = self.rss_feed.get_entry(entry_number)
+        if entry:
+            await ctx.send(entry["message"])
+        else:
+            await ctx.send(f"Entry number {entry_number} not found.")
