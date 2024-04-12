@@ -21,9 +21,11 @@ class FigurasBot:
 
     async def on_ready(self):
         self.send_rss.start()
+        self.client.command(name='pauserss')(self.pause_rss)
+        
         print("bot online")
     @commands.command(name='ping')
-    async def ping(self, ctx):
+    async def ping(ctx):
         await ctx.send("pong!")
 
     async def addchannel(self, ctx, channel: discord.TextChannel):
@@ -77,7 +79,7 @@ class FigurasBot:
                 await ctx.send("RSS task is already running.")
             else:
                 raise e
-    @commands.command(name='pauserss')
+     
     async def pause_rss(self, ctx):
         self.send_rss.cancel()
         await ctx.send("RSS task has been paused.")
