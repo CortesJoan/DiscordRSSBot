@@ -14,8 +14,7 @@ class FigurasBot(commands.Bot):
         
     
     def run(self):
-        self.client.event(self.on_ready)
-        self.client.run(os.environ.get("TOKEN"))
+       super().run(os.environ.get("TOKEN"))
 
     async def on_ready(self):
         self.send_rss.start()
