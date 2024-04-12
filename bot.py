@@ -10,7 +10,7 @@ class FigurasBot(commands.Bot):
 
     @commands.command(name='ping')
     async def ping(self, ctx):
-        await ctx.send("pong!")
+        await ctx.send("pongu!")
     
     def run(self):
-      super().run(os.environ.get("TOKEN"))
+        super().run(os.environ.get("TOKEN"))
