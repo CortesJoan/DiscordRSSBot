@@ -17,7 +17,6 @@ class FigurasBot:
         self.client.command(name='addchannel')(self.addchannel)
         self.client.command(name='removechannel')(self.removechannel)
         self.client.command(name='getrssentry')(self.getrssentry)
-        self.client.command(name='pauserss')(self.pause_rss)
         self.client.run(os.environ.get("TOKEN"))
 
     async def on_ready(self):
@@ -78,7 +77,7 @@ class FigurasBot:
                 await ctx.send("RSS task is already running.")
             else:
                 raise e
- 
+    @commands.command(name='pauserss')
     async def pause_rss(self, ctx):
         self.send_rss.cancel()
         await ctx.send("RSS task has been paused.")
