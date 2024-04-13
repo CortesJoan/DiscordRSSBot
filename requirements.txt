@@ -2,3 +2,5 @@ flask
 discord
 feedparser
 firebase_admin
+python-dotenv
+aiohttp

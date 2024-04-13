@@ -1,15 +1,17 @@
 import os
 import discord
 from discord.ext import commands
-from test_bot import TestBot
+#sfrom test_bot import TestBot
 from bot import FigurasBot
 from keep_alive import keep_alive
+from dotenv import load_dotenv
 
 def main():
     intents = discord.Intents.all()
-    bot = FigurasBot(intents=intents)
+    load_dotenv()
+    client = commands.Bot(command_prefix='loli-', intents=intents)
+    bot = FigurasBot(client)
     bot.run()
-
 if __name__ == "__main__":
     keep_alive()
     main()
