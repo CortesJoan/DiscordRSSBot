@@ -32,4 +32,10 @@ class FirebaseService:
         return self.bot_data_ref.child("last_link").get() or ""
 
     def save_sent_link(self, link):
+        existing_links = self.sent_links_ref.get()
+        if existing_links:
+            for _, existing_link in existing_links.items():
+                if existing_link == link:
+                    return
+ 
         self.sent_links_ref.push().set(link)

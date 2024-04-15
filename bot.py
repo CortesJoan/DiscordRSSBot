@@ -7,7 +7,6 @@ import re
 
 class FigurasBot:
     interval = 10
-
     def __init__(self, client):
         self.client = client
         self.rss_feed = RSSFeed(self)  # Pass the bot instance to RSSFeed
@@ -15,24 +14,30 @@ class FigurasBot:
         self.channel_ids = self.load_channel_ids()
 
         @self.client.command("ping")
-        async def ping(self):
-            await self.send("pong!")
+        async def ping(ctx):
+            await ctx.send("pong!")
 
         @self.client.command("addchannel")
-        async def addchannel(self, ctx, channel: discord.TextChannel):
-            self.channel_ids.append(channel.id)
+        async def addchannel(ctx, channel: discord.TextChannel):
+            if channel is None:
+                    await ctx.send(f"Please provide a valid channel")
+                    return
+            self.append(channel.id)
             await ctx.send(f"Channel id {channel.id} added!")
 
         @self.client.command("removechannel")
-        async def removechannel(self, ctx, channel_id: int):
+        async def removechannel(ctx, channel_id: int):
+            if channel_id is None:
+                    await ctx.send(f"Please provide a valid channel")
+                    return
             if channel_id in self.channel_ids:
                 self.channel_ids.remove(channel_id)
                 await ctx.send(f"Channel id {channel_id} removed!")
             else:
                 await ctx.send(f"Channel id {channel_id} is not in the list of channels!")
-
+ 
         @self.client.command(name='startrss')
-        async def start_rss(self, ctx):
+        async def start_rss(ctx):
             try:
                 self.send_rss.start()
                 await ctx.send("RSS task has been started.")
@@ -43,18 +48,21 @@ class FigurasBot:
                     raise e
 
         @self.client.command(name='pauserss')
-        async def pause_rss(self, ctx):
+        async def pause_rss(ctx):
             self.send_rss.cancel()
             await ctx.send("RSS task has been paused.")
         @self.client.command(name='restartrss')
-        async def restart_rss(self, ctx):
+        async def restart_rss(ctx):
             self.send_rss.cancel()
+            await ctx.send("Restarting task")
             self.send_rss.start()
             await ctx.send("RSS task has been restarted.")
         @self.client.command(name='getrss')
-        async def get_rss_entry(self, ctx, index: int = 0):
+        async def get_rss_entry(ctx, index: int = 0):
             try:
                 feed_entries = self.rss_feed.get_feed_entries()
+                feed_entries.reverse()
+                   
                 if index is None:
                     await ctx.send(f"Please provide an index between 0 and {len(feed_entries) - 1}.")
                 elif 0 <= index < len(feed_entries):
@@ -63,7 +71,7 @@ class FigurasBot:
                     message = re.sub(r'<[^>]*>', '', message)
                     message = re.sub("🧸", self.rss_feed.emote_to_put_at_message_start, message)
                     message = re.sub("@Hobbyfiguras: ", '', message)
-                    await ctx.send(message)
+                    await ctx.send(self.rss_feed.refine_entry(entry))
                 else:
                     await ctx.send(f"Invalid index. Please provide a value between 0 and {len(feed_entries) - 1}.")
             except Exception as e:

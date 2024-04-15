@@ -26,7 +26,7 @@ class RSSFeed:
                             message = re.sub(r'<[^>]*>', '', message)
                             message = re.sub("🧸", self.emote_to_put_at_message_start, message)
                             message = re.sub("@Hobbyfiguras: ", '', message)
-                            new_messages.append({"message": message, "link": link})
+                            new_messages.append({"message": self.refine_entry(message,rss_base_domain), "link": link})
                             self.bot.firebase_service.save_sent_link(link)
         except Exception as e:
             print("Error while parsing RSS feed: ", e)
@@ -37,5 +37,17 @@ class RSSFeed:
             final_url = rss_base_domain + self.rss_account
             feed = feedparser.parse(final_url)
             if feed.entries:
+                for entry in feed.entries:
+                    link = entry.link
+                    base_domain_pattern = re.escape(rss_base_domain)
+                    link = re.sub(base_domain_pattern, 'https://fxtwitter.com', link)
+                    entry.link = link
                 feed_entries.extend(feed.entries)
         return feed_entries
+    def refine_entry(self, entry):
+        message = f"🧸| {entry.title}\n{entry.link}"
+        message = re.sub(r'<[^>]*>', '', message)
+        message = re.sub("🧸", self.emote_to_put_at_message_start, message)
+        message = re.sub("@Hobbyfiguras: ", '', message)
+        return message
+
