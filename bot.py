@@ -18,7 +18,7 @@ class FigurasBot:
             await ctx.send("pong!")
 
         @self.client.command("addchannel")
-        async def addchannel(ctx, channel: discord.TextChannel):
+        async def add_channel(ctx, channel: discord.TextChannel):
             if channel is None:
                     await ctx.send(f"Please provide a valid channel")
                     return
@@ -26,7 +26,7 @@ class FigurasBot:
             await ctx.send(f"Channel id {channel.id} added!")
 
         @self.client.command("removechannel")
-        async def removechannel(ctx, channel_id: int):
+        async def remove_channel(ctx, channel_id: int):
             if channel_id is None:
                     await ctx.send(f"Please provide a valid channel")
                     return
@@ -58,26 +58,40 @@ class FigurasBot:
             self.send_rss.start()
             await ctx.send("RSS task has been restarted.")
         @self.client.command(name='getrss')
-        async def get_rss_entry(ctx, index: int = 0):
+        async def get_rss_entry(ctx, range_str: str = None):
             try:
                 feed_entries = self.rss_feed.get_feed_entries()
-                feed_entries.reverse() 
-                   
-                if index is None:
-                    await ctx.send(f"Please provide an index between 0 and {len(feed_entries) - 1}.")
-                elif 0 <= index < len(feed_entries):
-                    entry = feed_entries[index]
-                    message = f"🧸| {entry.title}\n{entry.link}"
-                    message = re.sub(r'<[^>]*>', '', message)
-                    message = re.sub("🧸", self.rss_feed.emote_to_put_at_message_start, message)
-                    message = re.sub("@Hobbyfiguras: ", '', message)
-                    await ctx.send(self.rss_feed.refine_entry(entry))
+                if range_str is None:
+                    await ctx.send(f"Please provide a range in the format 'start-end' (e.g., 0-5). or an individual number like 1")
                 else:
-                    await ctx.send(f"Invalid index. Please provide a value between 0 and {len(feed_entries) - 1}.")
+                    if(range_str.__contains__('-')):
+                        start, end = map(int, range_str.split('-'))
+                        if start < 0 or end >= len(feed_entries) or start > end:
+                            await ctx.send("Invalid range. Please provide a valid range in the format 'start-end'.")
+                        else:
+                            
+                            for i in range(end, start - 1, -1):
+                                entry = feed_entries[i]
+                                await ctx.send(self.rss_feed.refine_entry(entry))
+                    else:
+                        index = int(range_str)
+                        if index < 0 or index >= len(feed_entries):
+                            await ctx.send("Invalid index. Please provide a valid index.")
+                        else:
+                            entry = feed_entries[index]
+                            await ctx.send(self.rss_feed.refine_entry(entry))
             except Exception as e:
                 print("Error while retrieving RSS entry: ", e)
                 await ctx.send("An error occurred while retrieving the RSS entry.")
-                 
+        @self.client.command(name='getallrss')
+        async def get_all_rss_entry(ctx):
+            try:
+                feed_entries = self.rss_feed.get_feed_entries()
+                for entry in feed_entries:
+                    await ctx.send(self.rss_feed.refine_entry(entry))
+            except Exception as e:
+                print("Error while retrieving RSS entry: ", e)
+                await ctx.send("An error occurred while retrieving the RSS entry.")
     
     def load_channel_ids(self):
         channel_id_env = os.environ.get("CHANNEL_IDS")
