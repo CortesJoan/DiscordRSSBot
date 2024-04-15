@@ -46,6 +46,11 @@ class FigurasBot:
         async def pause_rss(self, ctx):
             self.send_rss.cancel()
             await ctx.send("RSS task has been paused.")
+        @self.client.command(name='restartrss')
+        async def restart_rss(self, ctx):
+            self.send_rss.cancel()
+            self.send_rss.start()
+            await ctx.send("RSS task has been restarted.")
         @self.client.command(name='getrss')
         async def get_rss_entry(self, ctx, index: int = 0):
             try:
