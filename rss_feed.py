@@ -7,7 +7,6 @@ class RSSFeed:
         self.rss_base_domains = "https://nitter.privacydev.net", "https://nitter.poast.org" 
         self.rss_account = "/hobbyfiguras/rss"
         self.emote_to_put_at_message_start = "<:Yossixhehe:1109926657613103154>"
-
     def get_new_messages(self):
         new_messages = []
         try:
@@ -17,7 +16,7 @@ class RSSFeed:
                 final_url = rss_base_domain + self.rss_account
                 feed = feedparser.parse(final_url)
                 if feed.entries:
-                    for entry in reversed(feed.entries):
+                    for entry in feed.entries:  # Iterate over entries in chronological order
                         link = entry.link
                         base_domain_pattern = re.escape(rss_base_domain)
                         link = re.sub(base_domain_pattern, 'https://fxtwitter.com', link)
@@ -26,7 +25,7 @@ class RSSFeed:
                             message = re.sub(r'<[^>]*>', '', message)
                             message = re.sub("🧸", self.emote_to_put_at_message_start, message)
                             message = re.sub("@Hobbyfiguras: ", '', message)
-                            new_messages.append({"message": self.refine_entry(message,rss_base_domain), "link": link})
+                            new_messages.append({"message": self.refine_entry(message, rss_base_domain), "link": link})
                             self.bot.firebase_service.save_sent_link(link)
         except Exception as e:
             print("Error while parsing RSS feed: ", e)

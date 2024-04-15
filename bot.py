@@ -61,7 +61,7 @@ class FigurasBot:
         async def get_rss_entry(ctx, index: int = 0):
             try:
                 feed_entries = self.rss_feed.get_feed_entries()
-               
+                feed_entries.reverse() 
                    
                 if index is None:
                     await ctx.send(f"Please provide an index between 0 and {len(feed_entries) - 1}.")
