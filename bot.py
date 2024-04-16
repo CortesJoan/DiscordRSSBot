@@ -120,7 +120,8 @@ class FigurasBot:
             for channel_id in self.channel_ids:
                 channel = self.client.get_channel(channel_id)
                 if channel is not None:
-                    for new_message in new_messages:
+                    for i in range(len(new_messages) - 1, -1, -1):
+                        new_message = new_messages[i]
                         await channel.send(new_message["message"])
                         self.firebase_service.save_sent_link(
                             new_message["link"])
