@@ -6,7 +6,7 @@ from dateutil import parser
 class RSSFeed:
     def __init__(self, bot):
         self.bot = bot  # Store the bot instance
-        self.rss_base_domains = "https://nitter.privacydev.net", "https://nitter.poast.org", "https://nitter.esmailelbob.xyz"
+        self.rss_base_domains = "https://nitter.privacydev.net", "https://nitter.poast.org", "http://nitter.esmailelbob.xyz"
         self.rss_account = "/hobbyfiguras/rss"
         self.emote_to_put_at_message_start = "<:Yossixhehe:1109926657613103154>"
 
