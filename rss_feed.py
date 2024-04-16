@@ -31,15 +31,18 @@ class RSSFeed:
         seen_links = set() 
         for rss_base_domain in self.rss_base_domains:
             final_url = rss_base_domain + self.rss_account
-            feed = feedparser.parse(final_url)
-            if feed.entries:
-                for entry in feed.entries:
-                    self.fix_link(entry,rss_base_domain)
-                    entry.published_parsed = parser.parse(entry.published)
-                    if entry.link not in seen_links:
-                        feed_entries.append(entry)
-                        seen_links.add(entry.link)
-                        
+            try:
+                feed = feedparser.parse(final_url)
+                if feed.entries:
+                    for entry in feed.entries:
+                        self.fix_link(entry,rss_base_domain)
+                        entry.published_parsed = parser.parse(entry.published)
+                        if entry.link not in seen_links:
+                            feed_entries.append(entry)
+                            seen_links.add(entry.link)
+            except Exception as e:
+                print("Error while parsing RSS feed: " + final_url, e)
+                    
         feed_entries.sort(key=lambda x: x.published_parsed, reverse=True)
         return feed_entries
     def fix_link(self,entry,rss_base_domain):
