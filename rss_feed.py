@@ -40,7 +40,7 @@ class RSSFeed:
                         if entry.link not in seen_links:
                             feed_entries.append(entry)
                             seen_links.add(entry.link)
-            except Exception as e:
+            except TimeoutError as e:
                 print("Error while parsing RSS feed: " + final_url, e)
                     
         feed_entries.sort(key=lambda x: x.published_parsed, reverse=True)
