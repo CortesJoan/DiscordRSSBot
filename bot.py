@@ -92,6 +92,11 @@ class FigurasBot:
             except Exception as e:
                 print("Error while retrieving RSS entry: ", e)
                 await ctx.send("An error occurred while retrieving the RSS entry.")
+        @self.client.command(name='forcesend')
+        async def force_send(ctx):
+            print("Forcing send")
+            self.send_rss();
+
     
     def load_channel_ids(self):
         channel_id_env = os.environ.get("CHANNEL_IDS")
