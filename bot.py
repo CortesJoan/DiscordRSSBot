@@ -99,6 +99,9 @@ class RssBot:
         async def force_send(ctx):
             print("Forcing send")
             self.send_rss();
+        @self.app_commands.command(name='sendmessage', description='Discord me ha obligado a poner esto')
+        async def send_message(self, interaction: discord.Interaction):
+                await interaction.response.send_message("DISCORD NO BAKA!")
 
     
     def load_channel_ids(self):
