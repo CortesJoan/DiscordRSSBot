@@ -5,7 +5,7 @@ from rss_feed import RSSFeed
 from firebase_service import FirebaseService
 import re
 
-class FigurasBot:
+class RssBot:
     interval = 10
     def __init__(self, client):
         self.client = client
@@ -22,7 +22,8 @@ class FigurasBot:
             if channel is None:
                     await ctx.send(f"Please provide a valid channel")
                     return
-            self.append(channel.id)
+            self.channel_ids.append(channel.id)
+            os.environ['CHANNEL_IDS'] = str(self.channel_ids)
             await ctx.send(f"Channel id {channel.id} added!")
 
         @self.client.command("removechannel")
@@ -32,6 +33,7 @@ class FigurasBot:
                     return
             if channel_id in self.channel_ids:
                 self.channel_ids.remove(channel_id)
+                os.environ['CHANNEL_IDS'] = str(self.channel_ids)
                 await ctx.send(f"Channel id {channel_id} removed!")
             else:
                 await ctx.send(f"Channel id {channel_id} is not in the list of channels!")

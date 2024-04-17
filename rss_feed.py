@@ -1,15 +1,22 @@
 import feedparser
 import re
+import os
 from datetime import datetime
 from dateutil import parser
 
 class RSSFeed:
     def __init__(self, bot):
-        self.bot = bot  # Store the bot instance
-        self.rss_base_domains = "https://nitter.privacydev.net", "https://nitter.poast.org", "http://nitter.esmailelbob.xyz"
-        self.rss_account = "/hobbyfiguras/rss"
+        self.bot = bot   
+        self.rss_base_domains =  self.load_rss_base_domains() 
+        self.rss_account =   os.environ.get("TARGET_ACCOUNT") + "/rss"
         self.emote_to_put_at_message_start = "<:Yossixhehe:1109926657613103154>"
 
+    def load_rss_base_domains(self):
+            channel_id_env = os.environ.get("RSS_PROVIDERS")
+            if channel_id_env:
+                return [id.strip() for id in channel_id_env.split(",")]
+            else:
+                return []
     def get_new_messages(self):
         new_messages = []
         try:
