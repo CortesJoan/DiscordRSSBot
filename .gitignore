@@ -13,3 +13,4 @@
 batchCopyPython.bat
 Project_Files.txt
 .vscode/launch.json
+.env

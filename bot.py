@@ -6,7 +6,8 @@ from firebase_service import FirebaseService
 import re
 
 class RssBot:
-    interval = 10
+    interval = int(os.environ.get("INTERVAL"))
+
     def __init__(self, client):
         self.client = client
         self.rss_feed = RSSFeed(self)  # Pass the bot instance to RSSFeed
