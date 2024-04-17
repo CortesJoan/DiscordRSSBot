@@ -30,7 +30,7 @@ A Discord bot that posts RSS feed updates of a Twitter user to a specified chann
 
 ## Usage
 1. Set up a Discord bot and obtain its token.
-2. Create a Firebase Realtime Database project and download the service account key.
+2. Create a Firebase Realtime Database project and download the service account key `ServiceAccount.json` .
 3. Create a `.env` file with the required configuration variables (see the .env.example file).
 4. Install the required Python modules: `pip install -r requirements.txt`
 5. Run the bot: `python main.py`
