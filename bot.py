@@ -100,7 +100,7 @@ class RssBot:
             print("Forcing send")
             self.send_rss();
         @self.client.tree.command(name='sendmessage', description='Discord me ha obligado a poner esto')
-        async def send_message(self, interaction: discord.Interaction):
+        async def send_message(interaction: discord.Interaction):
                 await interaction.response.send_message("DISCORD NO BAKA!")
 
     
@@ -112,6 +112,12 @@ class RssBot:
             return []
 
     async def on_ready(self):
+        try:
+            synced = await self.client.tree.sync()
+            print(f"Synced {len(synced)} commands")
+        except Exception as e:
+            print(e)
+
         self.send_rss.start()
         print("bot online")
 
