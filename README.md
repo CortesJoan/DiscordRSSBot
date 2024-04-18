@@ -34,7 +34,7 @@ A Discord bot that posts RSS feed updates of a Twitter user to a specified chann
 3. Create a `.env` file with the required configuration variables (see the .env.example file).
 4. Install the required Python modules: `pip install -r requirements.txt`
 5. Run the bot: `python main.py`
-6. Use the following commands in your Discord server (! is the prefix by default):
+6. Use the following commands in your Discord server (`!` is the prefix by default or you can use slash commands `/`):
    - `!ping`: Test the bot's responsiveness.
    - `!addchannel <channel_mention>`: Add a channel to receive tweets.
    - `!removechannel <channel_id>`: Remove a channel from receiving tweets.

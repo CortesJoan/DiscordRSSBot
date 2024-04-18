@@ -14,11 +14,11 @@ class RssBot:
         self.firebase_service = FirebaseService()
         self.channel_ids = self.load_channel_ids()
 
-        @self.client.command("ping")
+        @self.client.hybrid_command(name="ping", description="Test the bot's responsiveness.")
         async def ping(ctx):
             await ctx.send("pong!")
 
-        @self.client.command("addchannel")
+        @self.client.hybrid_command(name="addchannel", description="Add a channel to receive tweets.")
         async def add_channel(ctx, channel: discord.TextChannel):
             if channel is None:
                     await ctx.send(f"Please provide a valid channel")
@@ -27,7 +27,7 @@ class RssBot:
             os.environ['CHANNEL_IDS'] = str(self.channel_ids)
             await ctx.send(f"Channel id {channel.id} added!")
 
-        @self.client.command("removechannel")
+        @self.client.hybrid_command(name="removechannel", description="Remove a channel from receiving tweets.")
         async def remove_channel(ctx, channel_id: int):
             if channel_id is None:
                     await ctx.send(f"Please provide a valid channel")
@@ -39,7 +39,7 @@ class RssBot:
             else:
                 await ctx.send(f"Channel id {channel_id} is not in the list of channels!")
  
-        @self.client.command(name='startrss')
+        @self.client.hybrid_command(name='startrss', description="Start the task of fetching and sending tweets.")
         async def start_rss(ctx):
             try:
                 self.send_rss.start()
@@ -50,17 +50,17 @@ class RssBot:
                 else:
                     raise e
 
-        @self.client.command(name='pauserss')
+        @self.client.hybrid_command(name='pauserss', description="Pause the tweet fetching and sending task.")
         async def pause_rss(ctx):
             self.send_rss.cancel()
             await ctx.send("RSS task has been paused.")
-        @self.client.command(name='restartrss')
+        @self.client.hybrid_command(name='restartrss', description="Restart the tweet fetching and sending task.")
         async def restart_rss(ctx):
             self.send_rss.cancel()
             await ctx.send("Restarting task")
             self.send_rss.start()
             await ctx.send("RSS task has been restarted.")
-        @self.client.command(name='getrss')
+        @self.client.hybrid_command(name='getrss', description="Retrieve specific tweets (e.g., !getrss 0-5 or !getrss 3).")
         async def get_rss_entry(ctx, range_str: str = None):
             try:
                 feed_entries = self.rss_feed.get_feed_entries()
@@ -86,7 +86,7 @@ class RssBot:
             except Exception as e:
                 print("Error while retrieving RSS entry: ", e)
                 await ctx.send("An error occurred while retrieving the RSS entry.")
-        @self.client.command(name='getallrss')
+        @self.client.hybrid_command(name='getallrss',description= "Get all rss from the last rss ")
         async def get_all_rss_entry(ctx):
             try:
                 feed_entries = self.rss_feed.get_feed_entries()
@@ -95,13 +95,10 @@ class RssBot:
             except Exception as e:
                 print("Error while retrieving RSS entry: ", e)
                 await ctx.send("An error occurred while retrieving the RSS entry.")
-        @self.client.command(name='forcesend')
+        @self.client.hybrid_command(name='forcesend',description= "Force the sending of the newest tweets")
         async def force_send(ctx):
             print("Forcing send")
             self.send_rss();
-        @self.client.tree.command(name='sendmessage', description='Discord me ha obligado a poner esto')
-        async def send_message(interaction: discord.Interaction):
-                await interaction.response.send_message("DISCORD NO BAKA!")
 
     
     def load_channel_ids(self):
