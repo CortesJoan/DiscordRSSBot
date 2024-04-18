@@ -8,7 +8,7 @@ class RSSFeed:
     def __init__(self, bot):
         self.bot = bot   
         self.rss_base_domains =  self.load_rss_base_domains() 
-        self.rss_account =   os.environ.get("TARGET_ACCOUNT") + "/rss"
+        self.rss_account =   os.environ.get("TARGET_ACCOUNT") + "rss"
         self.emote_to_put_at_message_start = "<:Yossixhehe:1109926657613103154>"
 
     def load_rss_base_domains(self):
@@ -38,6 +38,7 @@ class RSSFeed:
         seen_links = set() 
         for rss_base_domain in self.rss_base_domains:
             final_url = rss_base_domain + self.rss_account
+            print(final_url)
             try:
                 feed = feedparser.parse(final_url)
                 if feed.entries:
