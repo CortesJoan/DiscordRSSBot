@@ -99,8 +99,16 @@ class RssBot:
         async def force_send(ctx):
             print("Forcing send")
             self.send_rss();
-
-    
+        @self.client.hybrid_command(name='convertlist', description="Convert a list of names to a Mudae command.")
+        async def convert_list(ctx, *, names: str):
+            if not names:
+                await ctx.send("Please provide a list of names.")
+                return
+            # Splitting the string based on newlines or commas
+            name_list = [name.strip().replace('*', '') for name in re.split(r'\n|,', names)]
+            command = " ".join(f"${name.replace(' ', '_')}" for name in name_list)
+            await ctx.send(f"$topip {command}")
+            
     def load_channel_ids(self):
         channel_id_env = os.environ.get("CHANNEL_IDS")
         if channel_id_env:
@@ -143,11 +151,4 @@ class RssBot:
             print("No new messages to send")
       
       
-        @self.client.hybrid_command(name='convertlist', description="Convert a list of names to a Mudae command.")
-        async def convert_list(ctx, *names):
-            if not names:
-                await ctx.send("Please provide a list of names.")
-                return
-            cleaned_names = [name.replace('*', '').strip() for name in names]
-            command = " ".join(f"${name.replace(' ', '_')}" for name in cleaned_names)
-            await ctx.send(f"$topip {command}")
+      
