@@ -104,7 +104,7 @@ class RssBot:
             try:
                 # Split the input string into individual names and remove leading asterisks
                 name_list = [name.lstrip('*').strip() for name in re.split(r',\s*|\s+', names)]
-                mudae_command = "$topip " + " ".join(f"${name.replace(' ', '_')}" for name in name_list)
+                mudae_command = "$topip " + " ".join(f"${name}" for name in name_list)
                 await ctx.send(mudae_command)
             except Exception as e:
                 print("Error while converting to Mudae command: ", e)
