@@ -100,16 +100,15 @@ class RssBot:
             print("Forcing send")
             self.send_rss();
         @self.client.hybrid_command(name='convertlist', description="Convert a list of names to a Mudae command.")
-        async def convert_to_mudae(ctx, names: str):
+        async def convert_to_mudae(ctx, *, names: str):
             try:
                 # Split the input string into individual names and remove leading asterisks
-                name_list = [name.lstrip('*').strip() for name in re.split(r'[\s,]+', names)]
+                name_list = [name.lstrip('*').strip() for name in names.splitlines() if name.strip()]
                 mudae_command = "$topip " + " ".join(f"${name}" for name in name_list)
                 await ctx.send(mudae_command)
             except Exception as e:
                 print("Error while converting to Mudae command: ", e)
                 await ctx.send("An error occurred while converting to Mudae command.")
-
             
     def load_channel_ids(self):
         channel_id_env = os.environ.get("CHANNEL_IDS")
