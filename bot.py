@@ -143,13 +143,11 @@ class RssBot:
             print("No new messages to send")
       
       
-        def convert_to_mudae_command(names):
-            command = "$topip " + " ".join([f"${name}" for name in names])
-            return command
-
-        @self.client.hybrid_command(name="mudae", description="Convert a list of names to a Mudae command.")
-        async def mudae(ctx, *, names: str):
-            name_list = names.split(',')
-            name_list = [name.strip() for name in name_list]  # Clean whitespace
-            mudae_command = convert_to_mudae_command(name_list)
-            await ctx.send(mudae_command)
+        @self.client.hybrid_command(name='convertlist', description="Convert a list of names to a Mudae command.")
+        async def convert_list(ctx, *names):
+            if not names:
+                await ctx.send("Please provide a list of names.")
+                return
+            cleaned_names = [name.replace('*', '').strip() for name in names]
+            command = " ".join(f"${name.replace(' ', '_')}" for name in cleaned_names)
+            await ctx.send(f"$topip {command}")
