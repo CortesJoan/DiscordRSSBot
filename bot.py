@@ -124,7 +124,13 @@ class RssBot:
 
     @tasks.loop(seconds=interval)
     async def send_rss(self):
-        bot_delay_between_messages=os.environ.get("BOT_DELAY_BETWEEN_MESSAGES", 0.5)
+        await self.process_rss()
+
+    async def manual_send_rss(self):
+        await self.process_rss()
+
+    async def process_rss(self):
+        bot_delay_between_messages = float(os.environ.get("BOT_DELAY_BETWEEN_MESSAGES", 0.5))
         new_messages = self.rss_feed.get_new_messages()
         if new_messages:
             for channel_id in self.channel_ids:
@@ -133,15 +139,13 @@ class RssBot:
                     for i in range(len(new_messages) - 1, -1, -1):
                         new_message = new_messages[i]
                         await channel.send(new_message["message"])
-                        self.firebase_service.save_sent_link(
-                            new_message["link"])
+                        self.firebase_service.save_sent_link(new_message["link"])
                         await asyncio.sleep(bot_delay_between_messages)
                 else:
                     print(f"Could not find channel with ID {channel_id}")
-            self.firebase_service.save_last_message(
-                new_messages[-1]["message"])
+            self.firebase_service.save_last_message(new_messages[-1]["message"])
             self.firebase_service.save_last_link(new_messages[-1]["link"])
         else:
             print("No new messages to send")
         new_messages.clear()
-        gc.collect()
+        gc.collect()  
