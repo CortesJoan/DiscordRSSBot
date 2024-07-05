@@ -3,8 +3,8 @@ import discord
 from discord.ext import commands, tasks
 from rss_feed import RSSFeed
 from firebase_service import FirebaseService
-import re
-
+import gc
+import asyncio
 class RssBot:
     interval = int(os.environ.get("INTERVAL"))
 
@@ -124,6 +124,7 @@ class RssBot:
 
     @tasks.loop(seconds=interval)
     async def send_rss(self):
+        bot_delay_between_messages=os.environ.get("BOT_DELAY_BETWEEN_MESSAGES", 0.5)
         new_messages = self.rss_feed.get_new_messages()
         if new_messages:
             for channel_id in self.channel_ids:
@@ -134,6 +135,7 @@ class RssBot:
                         await channel.send(new_message["message"])
                         self.firebase_service.save_sent_link(
                             new_message["link"])
+                        await asyncio.sleep(bot_delay_between_messages)
                 else:
                     print(f"Could not find channel with ID {channel_id}")
             self.firebase_service.save_last_message(
@@ -141,3 +143,5 @@ class RssBot:
             self.firebase_service.save_last_link(new_messages[-1]["link"])
         else:
             print("No new messages to send")
+        new_messages.clear()
+        gc.collect()
