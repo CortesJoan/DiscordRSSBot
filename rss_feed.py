@@ -41,6 +41,17 @@ class RSSFeed:
             print(final_url)
             try:
                 feed = feedparser.parse(final_url)
+                if hasattr(feed, 'status'):
+                    print(feed.status)    
+                    if feed.status == 301:
+                        new_url = feed.href
+                        print(f"The feed has been moved to: {new_url}")
+                        feed = feedparser.parse(new_url)
+                        
+                    elif feed.status != 200:
+                            print("Error while parsing RSS feed: " + final_url, feed.status)
+                            continue
+                    
                 if feed.entries:
                     for entry in feed.entries:
                         self.fix_link(entry,rss_base_domain)
@@ -57,6 +68,8 @@ class RSSFeed:
         link = entry.link
         base_domain_pattern = re.escape(rss_base_domain)
         link = re.sub(base_domain_pattern, 'https://fxtwitter.com', link)
+        link = re.sub("http://nitter.net", 'https://fxtwitter.com', link)
+
         entry.link = link
     
     def refine_entry(self, entry):
