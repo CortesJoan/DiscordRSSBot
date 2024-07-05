@@ -98,9 +98,9 @@ class RssBot:
         @self.client.hybrid_command(name='forcesend',description= "Force the sending of the newest tweets")
         async def force_send(ctx):
             print("Forcing send")
-            self.send_rss();
-
-    
+            await self.manual_send_rss()
+            await ctx.send("Force send completed.")
+ 
     def load_channel_ids(self):
         channel_id_env = os.environ.get("CHANNEL_IDS")
         if channel_id_env:
