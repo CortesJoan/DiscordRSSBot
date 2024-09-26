@@ -67,8 +67,8 @@ class RSSFeed:
     def fix_link(self,entry,rss_base_domain):
         link = entry.link
         base_domain_pattern = re.escape(rss_base_domain)
-        link = re.sub(base_domain_pattern, 'https://fxtwitter.com', link)
-        link = re.sub("http://nitter.net", 'https://fxtwitter.com', link)
+        link = re.sub(base_domain_pattern, 'https://vxtwitter.com', link)
+        link = re.sub("http://nitter.net", 'https://vxtwitter.com', link)
 
         entry.link = link
     
